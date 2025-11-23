@@ -397,7 +397,6 @@
             const btnText = btnLoop.querySelector('span');
             let isLooping = false;
 
-            // --- Lógica "Lazy Load" (Anti-Travamento) ---
             const overlays = document.querySelectorAll('.player-overlay');
             
             overlays.forEach(overlay => {
@@ -405,33 +404,35 @@
                     const audio = this.parentElement.querySelector('audio');
                     const textSpan = this.querySelector('span');
 
+                    // Feedback visual
                     textSpan.textContent = "⌛ Loading...";
                     
-                    // 1. INJEÇÃO DE LINK (O Segredo)
-                    // O navegador só sabe que existe um arquivo AGORA.
+                    // 1. Injeta o Source (Se ainda não tiver)
                     if (!audio.getAttribute('src')) {
                         audio.src = audio.getAttribute('data-src');
-                        audio.load(); // Força o navegador a processar o novo src
+                        audio.load();
                     }
                     
-                    // 2. Tenta Tocar
-                    audio.play();
-
-                    // 3. Esconder Capa (Seguro)
-                    // Se em 2.5s não carregar, mostra o player mesmo assim
-                    // para o usuário poder tentar clicar no play nativo.
-                    const showPlayer = () => {
-                        this.classList.add('hidden');
+                    // 2. Função que revela o player SÓ quando estiver pronto
+                    const revealAndPlay = () => {
+                        this.classList.add('hidden'); // Tchau capa!
+                        audio.play().catch(e => console.log("Play error:", e));
                     };
 
-                    audio.addEventListener('loadedmetadata', showPlayer, { once: true });
-                    audio.addEventListener('playing', showPlayer, { once: true });
-                    setTimeout(showPlayer, 2500);
+                    // 3. Espera o evento 'loadedmetadata' (Quando a duração carrega)
+                    // Se a duração já estiver disponível (cache), roda direto.
+                    if (audio.readyState >= 1) {
+                        revealAndPlay();
+                    } else {
+                        audio.addEventListener('loadedmetadata', revealAndPlay, { once: true });
+                        
+                        // Fallback: Se der erro ou demorar 5s, mostra o player mesmo assim
+                        setTimeout(revealAndPlay, 5000); 
+                    }
                 });
             });
 
-
-            // --- Lógica Padrão: Um por vez ---
+            // Pausa os outros
             audios.forEach(audio => {
                 audio.addEventListener('play', function() {
                     audios.forEach(otherAudio => {
@@ -442,7 +443,7 @@
                 });
             });
 
-            // --- Botão de Loop ---
+            // Loop
             btnLoop.addEventListener('click', function() {
                 isLooping = !isLooping; 
 
