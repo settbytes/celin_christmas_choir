@@ -144,7 +144,6 @@
             left: 0;
             width: 100%;
             height: 100%;
-            /* Fundo Sólido */
             background-color: var(--bg-player-box); 
             display: flex;
             align-items: center;
@@ -160,7 +159,6 @@
             border-radius: 30px;
         }
 
-        /* Hover opaco */
         .player-overlay:hover {
             background-color: #2a3455; 
             color: var(--text-white);
@@ -244,7 +242,7 @@
             
             <div class="audio-wrapper">
                 <div class="player-overlay"><span>▶ Play Full Song</span></div>
-                <audio controls preload="none" src="musicacompleta.mp3"></audio>
+                <audio controls data-src="musicacompleta.mp3"></audio>
             </div>
         </div>
 
@@ -260,7 +258,7 @@
                 <span class="label-title">Verse 1</span>
                 <div class="audio-wrapper">
                     <div class="player-overlay"><span>▶ Play Verse 1</span></div>
-                    <audio controls preload="none" src="estrofe1.mp3"></audio>
+                    <audio controls data-src="estrofe1.mp3"></audio>
                 </div>
             </div>
         </div>
@@ -277,7 +275,7 @@
                 <span class="label-title">Verse 2</span>
                 <div class="audio-wrapper">
                     <div class="player-overlay"><span>▶ Play Verse 2</span></div>
-                    <audio controls preload="none" src="estrofe2.mp3"></audio>
+                    <audio controls data-src="estrofe2.mp3"></audio>
                 </div>
             </div>
         </div>
@@ -294,7 +292,7 @@
                 <span class="label-title">Chorus 1</span>
                 <div class="audio-wrapper">
                     <div class="player-overlay"><span>▶ Play Chorus 1</span></div>
-                    <audio controls preload="none" src="estrofe3.mp3"></audio>
+                    <audio controls data-src="estrofe3.mp3"></audio>
                 </div>
             </div>
         </div>
@@ -311,7 +309,7 @@
                 <span class="label-title">Verse 3</span>
                 <div class="audio-wrapper">
                     <div class="player-overlay"><span>▶ Play Verse 3</span></div>
-                    <audio controls preload="none" src="estrofe4.mp3"></audio>
+                    <audio controls data-src="estrofe4.mp3"></audio>
                 </div>
             </div>
         </div>
@@ -328,7 +326,7 @@
                 <span class="label-title">Chorus 2</span>
                 <div class="audio-wrapper">
                     <div class="player-overlay"><span>▶ Play Chorus 2</span></div>
-                    <audio controls preload="none" src="estrofe5.mp3"></audio>
+                    <audio controls data-src="estrofe5.mp3"></audio>
                 </div>
             </div>
         </div>
@@ -345,7 +343,7 @@
                 <span class="label-title">Verse 4</span>
                 <div class="audio-wrapper">
                     <div class="player-overlay"><span>▶ Play Verse 4</span></div>
-                    <audio controls preload="none" src="estrofe6.mp3"></audio>
+                    <audio controls data-src="estrofe6.mp3"></audio>
                 </div>
             </div>
         </div>
@@ -362,7 +360,7 @@
                 <span class="label-title">Chorus 3</span>
                 <div class="audio-wrapper">
                     <div class="player-overlay"><span>▶ Play Chorus 3</span></div>
-                    <audio controls preload="none" src="estrofe7.mp3"></audio>
+                    <audio controls data-src="estrofe7.mp3"></audio>
                 </div>
             </div>
         </div>
@@ -379,7 +377,7 @@
                 <span class="label-title">Ending</span>
                 <div class="audio-wrapper">
                     <div class="player-overlay"><span>▶ Play Ending</span></div>
-                    <audio controls preload="none" src="estrofe8.mp3"></audio>
+                    <audio controls data-src="estrofe8.mp3"></audio>
                 </div>
             </div>
         </div>
@@ -399,7 +397,7 @@
             const btnText = btnLoop.querySelector('span');
             let isLooping = false;
 
-            // --- Lógica da Capa BLINDADA ---
+            // --- Lógica "Lazy Load" (Anti-Travamento) ---
             const overlays = document.querySelectorAll('.player-overlay');
             
             overlays.forEach(overlay => {
@@ -407,30 +405,27 @@
                     const audio = this.parentElement.querySelector('audio');
                     const textSpan = this.querySelector('span');
 
-                    // 1. Feedback Visual "Tentando..."
                     textSpan.textContent = "⌛ Loading...";
                     
+                    // 1. INJEÇÃO DE LINK (O Segredo)
+                    // O navegador só sabe que existe um arquivo AGORA.
+                    if (!audio.getAttribute('src')) {
+                        audio.src = audio.getAttribute('data-src');
+                        audio.load(); // Força o navegador a processar o novo src
+                    }
+                    
                     // 2. Tenta Tocar
-                    audio.play().catch(error => {
-                        console.log("Autoplay bloqueado ou erro de rede:", error);
-                    });
+                    audio.play();
 
-                    // Função para esconder a capa e mostrar o player
+                    // 3. Esconder Capa (Seguro)
+                    // Se em 2.5s não carregar, mostra o player mesmo assim
+                    // para o usuário poder tentar clicar no play nativo.
                     const showPlayer = () => {
                         this.classList.add('hidden');
                     };
 
-                    // 3. GATILHOS MÚLTIPLOS (Qualquer um que acontecer primeiro libera o player)
-                    
-                    // A: Se a duração carregar (ex: 0:00 -> 4:02)
-                    audio.addEventListener('durationchange', showPlayer, { once: true });
-                    
-                    // B: Se começar a tocar de fato
+                    audio.addEventListener('loadedmetadata', showPlayer, { once: true });
                     audio.addEventListener('playing', showPlayer, { once: true });
-
-                    // C: TIMEOUT DE SEGURANÇA (A Solução Final)
-                    // Se em 2.5 segundos nada acontecer, mostra o player de qualquer jeito
-                    // para o usuário não ficar preso.
                     setTimeout(showPlayer, 2500);
                 });
             });
