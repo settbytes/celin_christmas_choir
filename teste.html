@@ -93,7 +93,7 @@
         .s3 { color: var(--c3); }
         .s4 { color: var(--c4); }
 
-        /* --- Players --- */
+        /* --- Container dos Players --- */
         .player-card, .main-player-card {
             background-color: var(--bg-player-box);
             padding: 20px;
@@ -128,14 +128,52 @@
             color: var(--text-muted);
         }
 
-        audio {
+        /* --- CUSTOM PLAY BUTTON STYLES --- */
+        .custom-player-wrapper {
+            position: relative;
             width: 100%;
-            height: 40px;
-            outline: none;
+            height: 44px; /* Altura aproximada do player nativo */
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        
-        audio::-webkit-media-controls-panel {
-            background-color: rgba(255, 255, 255, 0.1);
+
+        /* O botão de Play Personalizado */
+        .btn-play-overlay {
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.08);
+            color: var(--c1);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 30px;
+            cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-play-overlay:hover {
+            background-color: var(--c1);
+            color: var(--bg-page);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+        }
+
+        /* Esconde o player nativo inicialmente */
+        audio.hidden-player {
+            display: none;
+            width: 100%;
+            height: 44px;
+        }
+
+        /* Quando ativo, mostramos o player nativo */
+        audio.active-player {
+            display: block;
         }
 
         /* --- ÁREA DE CONTROLES (Rodapé) --- */
@@ -196,7 +234,12 @@
 
         <div class="main-player-card">
             <span class="label-title">Full song</span>
-            <audio controls preload="metadata" src="musicacompleta.mp3"></audio>
+            
+            <div class="custom-player-wrapper">
+                <button class="btn-play-overlay">▶ Play Full Song</button>
+                <audio controls preload="none" class="hidden-player" src="musicacompleta.mp3"></audio>
+            </div>
+
         </div>
 
         <div class="stanza">
@@ -208,7 +251,10 @@
             </div>
             <div class="player-card">
                 <span class="label-title">Verse 1</span>
-                <audio controls preload="metadata" src="estrofe1.mp3"></audio>
+                <div class="custom-player-wrapper">
+                    <button class="btn-play-overlay">▶ Play Verse 1</button>
+                    <audio controls preload="none" class="hidden-player" src="estrofe1.mp3"></audio>
+                </div>
             </div>
         </div>
 
@@ -221,7 +267,10 @@
             </div>
             <div class="player-card">
                 <span class="label-title">Verse 2</span>
-                <audio controls preload="metadata" src="estrofe2.mp3"></audio>
+                <div class="custom-player-wrapper">
+                    <button class="btn-play-overlay">▶ Play Verse 2</button>
+                    <audio controls preload="none" class="hidden-player" src="estrofe2.mp3"></audio>
+                </div>
             </div>
         </div>
 
@@ -234,7 +283,10 @@
             </div>
             <div class="player-card">
                 <span class="label-title">Chorus 1</span>
-                <audio controls preload="metadata" src="estrofe3.mp3"></audio>
+                <div class="custom-player-wrapper">
+                    <button class="btn-play-overlay">▶ Play Chorus 1</button>
+                    <audio controls preload="none" class="hidden-player" src="estrofe3.mp3"></audio>
+                </div>
             </div>
         </div>
 
@@ -247,7 +299,10 @@
             </div>
             <div class="player-card">
                 <span class="label-title">Verse 3</span>
-                <audio controls preload="metadata" src="estrofe4.mp3"></audio>
+                <div class="custom-player-wrapper">
+                    <button class="btn-play-overlay">▶ Play Verse 3</button>
+                    <audio controls preload="none" class="hidden-player" src="estrofe4.mp3"></audio>
+                </div>
             </div>
         </div>
 
@@ -260,7 +315,10 @@
             </div>
             <div class="player-card">
                 <span class="label-title">Chorus 2</span>
-                <audio controls preload="metadata" src="estrofe5.mp3"></audio>
+                <div class="custom-player-wrapper">
+                    <button class="btn-play-overlay">▶ Play Chorus 2</button>
+                    <audio controls preload="none" class="hidden-player" src="estrofe5.mp3"></audio>
+                </div>
             </div>
         </div>
 
@@ -273,7 +331,10 @@
             </div>
             <div class="player-card">
                 <span class="label-title">Verse 4</span>
-                <audio controls preload="metadata" src="estrofe6.mp3"></audio>
+                <div class="custom-player-wrapper">
+                    <button class="btn-play-overlay">▶ Play Verse 4</button>
+                    <audio controls preload="none" class="hidden-player" src="estrofe6.mp3"></audio>
+                </div>
             </div>
         </div>
 
@@ -286,7 +347,10 @@
             </div>
             <div class="player-card">
                 <span class="label-title">Chorus 3</span>
-                <audio controls preload="metadata" src="estrofe7.mp3"></audio>
+                <div class="custom-player-wrapper">
+                    <button class="btn-play-overlay">▶ Play Chorus 3</button>
+                    <audio controls preload="none" class="hidden-player" src="estrofe7.mp3"></audio>
+                </div>
             </div>
         </div>
 
@@ -299,7 +363,10 @@
             </div>
             <div class="player-card">
                 <span class="label-title">Ending</span>
-                <audio controls preload="metadata" src="estrofe8.mp3"></audio>
+                <div class="custom-player-wrapper">
+                    <button class="btn-play-overlay">▶ Play Ending</button>
+                    <audio controls preload="none" class="hidden-player" src="estrofe8.mp3"></audio>
+                </div>
             </div>
         </div>
 
@@ -315,18 +382,31 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const audios = document.querySelectorAll('audio');
             const btnLoop = document.getElementById('btnLoop');
             const btnText = btnLoop.querySelector('span');
             let isLooping = false;
 
-            // 1. Lógica de Players
-            audios.forEach(audio => {
-                audio.addEventListener('play', function() {
-                    
-                    // Pausa os outros. 
-                    // NÃO alteramos o preload para 'none' aqui para não zerar o tempo exibido.
-                    audios.forEach(otherAudio => {
+            // Seleciona todos os botões de sobreposição
+            const overlays = document.querySelectorAll('.btn-play-overlay');
+
+            overlays.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // 1. Acha o container pai e o áudio dentro dele
+                    const wrapper = this.parentElement;
+                    const audio = wrapper.querySelector('audio');
+
+                    // 2. Esconde o botão e mostra o player
+                    this.style.display = 'none';
+                    audio.classList.remove('hidden-player');
+                    audio.classList.add('active-player');
+
+                    // 3. Força o carregamento e toca
+                    // Isso evita travamentos pois só carrega ao clicar
+                    audio.play();
+
+                    // 4. Pausa todos os OUTROS áudios que já estiverem abertos
+                    const allAudios = document.querySelectorAll('audio');
+                    allAudios.forEach(otherAudio => {
                         if (otherAudio !== audio) {
                             otherAudio.pause();
                         }
@@ -334,7 +414,19 @@
                 });
             });
 
-            // 2. Lógica do Botão de Loop
+            // 5. Lógica para garantir que só 1 toque por vez (mesmo depois de aberto)
+            const allAudios = document.querySelectorAll('audio');
+            allAudios.forEach(audio => {
+                audio.addEventListener('play', function() {
+                    allAudios.forEach(other => {
+                        if (other !== audio) {
+                            other.pause();
+                        }
+                    });
+                });
+            });
+
+            // 6. Lógica do Botão de Loop
             btnLoop.addEventListener('click', function() {
                 isLooping = !isLooping; 
 
@@ -346,7 +438,7 @@
                     btnText.textContent = "🔁 Auto Repeat: OFF";
                 }
 
-                audios.forEach(audio => {
+                allAudios.forEach(audio => {
                     audio.loop = isLooping;
                 });
             });
