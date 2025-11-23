@@ -319,34 +319,7 @@
             const btnText = btnLoop.querySelector('span');
             let isLooping = false;
 
-            // --- 1. Sistema de Fila para Carregar Metadados (Resolve o 0:00 sem travar) ---
-            
-            // Função recursiva para carregar um por um
-            function loadMetadataSequence(index) {
-                // Se já carregou todos, para.
-                if (index >= audios.length) return;
-
-                const audio = audios[index];
-
-                // Define o evento: quando carregar os dados deste, chama o próximo
-                audio.onloadedmetadata = function() {
-                    loadMetadataSequence(index + 1);
-                };
-                
-                // Em caso de erro (arquivo não existe), pula para o próximo para não travar a fila
-                audio.onerror = function() {
-                    loadMetadataSequence(index + 1);
-                };
-
-                // Força o carregamento dos metadados deste áudio específico
-                audio.preload = 'metadata';
-            }
-
-            // Inicia a fila a partir do primeiro áudio (índice 0)
-            loadMetadataSequence(0);
-
-
-            // --- 2. Lógica para garantir que apenas um toque por vez ---
+            // Lógica: Toca um, para os outros. O navegador atualiza o tempo nativamente ao tocar.
             audios.forEach(audio => {
                 audio.addEventListener('play', function() {
                     audios.forEach(otherAudio => {
@@ -357,7 +330,7 @@
                 });
             });
 
-            // --- 3. Lógica do Botão de Loop ---
+            // Lógica do Botão de Loop
             btnLoop.addEventListener('click', function() {
                 isLooping = !isLooping; 
 
