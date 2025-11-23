@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Survivor - Eye of the Tiger (Song and Lyrics)</title>
+
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐯</text></svg>">
+
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* --- Variáveis e Cores --- */
+        :root {
+            --bg-page: #1e2543;
+            --bg-card: #252d4e;
+            --bg-player-box: #181e36;
+            --line-guide: #3E4C7A;
+            
+            --c1: #FFD700; /* Gold */
+            --c2: #FF6B6B; /* Salmon */
+            --c3: #4ECDC4; /* Teal/Mint */
+            --c4: #5dade2; /* Blue */
+
+            --text-white: #ffffff;
+            --text-muted: #8d99ae;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--bg-page);
+            color: var(--text-white);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            animation: fadeIn 0.8s ease-out;
+            padding-bottom: 60px; /* Espaço extra para o botão */
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--c1);
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 40px;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            letter-spacing: 1px;
+        }
+        
+        h1 span {
+            color: var(--text-white);
+            display: block;
+            margin-top: 5px;
+            font-size: 0.7em;
+        }
+
+        /* --- Estilos de Texto --- */
+        .stanza { margin-bottom: 50px; }
+
+        .lyrics-block {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .line {
+            font-size: 1.3rem;
+            font-weight: 700;
+            line-height: 1.5;
+            padding-left: 20px;
+            border-left: 3px solid var(--line-guide);
+        }
+
+        /* Cores */
+        .s1 { color: var(--c1); }
+        .s2 { color: var(--c2); }
+        .s3 { color: var(--c3); }
+        .s4 { color: var(--c4); }
+
+        /* --- Players --- */
+        .player-card, .main-player-card {
+            background-color: var(--bg-player-box);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .main-player-card {
+            background-color: var(--bg-card);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 50px;
+            border-bottom: 4px solid var(--c1);
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .label-title {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        
+        .main-player-card .label-title {
+            text-align: center;
+            color: var(--text-muted);
+        }
+
+        audio {
+            width: 100%;
+            height: 40px;
+            outline: none;
+        }
+        
+        audio::-webkit-media-controls-panel {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* --- ÁREA DE CONTROLES (Rodapé) --- */
+        .controls-area {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column; /* Alterado para coluna para empilhar */
+            gap: 20px; /* Espaço entre os botões */
+            margin-top: 40px;
+        }
+
+        /* Botão Loop e Botão Alternativo (Estilo Unificado) */
+        .btn-loop, .btn-alt {
+            background-color: var(--bg-player-box);
+            color: var(--text-muted);
+            border: 2px solid var(--line-guide);
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%; /* Ocupa largura em telas pequenas */
+            max-width: 300px;
+            text-decoration: none; /* Remove sublinhado do link */
+        }
+
+        .btn-loop:hover, .btn-alt:hover {
+            background-color: rgba(255,255,255,0.05);
+        }
+
+        .btn-loop.active {
+            background-color: var(--c1); /* Amarelo */
+            color: var(--bg-page); /* Fundo escuro */
+            border-color: var(--c1);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+        }
+
+        @media (max-width: 600px) {
+            .line { font-size: 1.1rem; padding-left: 15px; }
+            h1 { font-size: 1.8rem; }
+            .btn-loop, .btn-alt { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <h1>Survivor - Eye Of The Tiger<br><span>Song and Lyrics</span></h1>
+
+        <div class="main-player-card">
+            <span class="label-title">Full song</span>
+            <audio controls src="musicacompleta.mp3"></audio>
+        </div>
+
+        <div class="stanza">
+            <div class="lyrics-block">
+                <div class="line"><span class="s1">Risin' up,</span> <span class="s2">back on the street</span></div>
+                <div class="line"><span class="s2">Did my time,</span> <span class="s4">took my chances</span></div>
+                <div class="line"><span class="s1">Went the distance, now I'm back on my feet</span></div>
+                <div class="line"><span class="s2">Just a man</span> <span class="s4">and his will</span> <span class="s1">to survive</span></div>
+            </div>
+            <div class="player-card">
+                <span class="label-title">Verse 1</span>
+                <audio controls src="estrofe1.mp3"></audio>
+            </div>
+        </div>
+
+        <div class="stanza">
+            <div class="lyrics-block">
+                <div class="line"><span class="s4">So many times,</span> <span class="s1">it happens too fast</span></div>
+                <div class="line"><span class="s2">You trade your passion for glory</span></div>
+                <div class="line"><span class="s1">Don't lose your grip</span> <span class="s4">on the dreams of the past</span></div>
+                <div class="line"><span class="s1">You must fight</span> <span class="s2">just to keep</span> <span class="s3">them alive</span></div>
+            </div>
+            <div class="player-card">
+                <span class="label-title">Verse 2</span>
+                <audio controls src="estrofe2.mp3"></audio>
+            </div>
+        </div>
+
+        <div class="stanza">
+            <div class="lyrics-block">
+                <div class="line"><span class="s4">It's the</span> <span class="s1">eye of the tiger, it's the thrill of the fight</span></div>
+                <div class="line"><span class="s2">Risin' up</span> <span class="s3">to the challenge of our rival</span></div>
+                <div class="line"><span class="s4">And the last</span> <span class="s1">known survivor stalks his prey in the night</span></div>
+                <div class="line"><span class="s2">And he's watching us all with the eye</span> <span class="s3">of the tiger</span></div>
+            </div>
+            <div class="player-card">
+                <span class="label-title">Chorus 1</span>
+                <audio controls src="estrofe3.mp3"></audio>
+            </div>
+        </div>
+
+        <div class="stanza">
+            <div class="lyrics-block">
+                <div class="line"><span class="s4">Face to face,</span> <span class="s1">out on the heat</span></div>
+                <div class="line"><span class="s2">Hangin' tough,</span> <span class="s3">stayin' hungry</span></div>
+                <div class="line"><span class="s4">They stack the odds</span> <span class="s1">still we take to the street</span></div>
+                <div class="line"><span class="s1">For the kill,</span> <span class="s2">with the skill</span> <span class="s3">to survive</span></div>
+            </div>
+            <div class="player-card">
+                <span class="label-title">Verse 3</span>
+                <audio controls src="estrofe4.mp3"></audio>
+            </div>
+        </div>
+
+        <div class="stanza">
+            <div class="lyrics-block">
+                <div class="line"><span class="s4">It's the</span> <span class="s1">eye of the tiger, it's the thrill of the fight</span></div>
+                <div class="line"><span class="s2">Risin' up</span> <span class="s3">to the challenge of our rival</span></div>
+                <div class="line"><span class="s4">And the last</span> <span class="s1">known survivor stalks his prey in the night</span></div>
+                <div class="line"><span class="s2">And he's watching us all with the eye</span> <span class="s3">of the tiger</span></div>
+            </div>
+            <div class="player-card">
+                <span class="label-title">Chorus 2</span>
+                <audio controls src="estrofe5.mp3"></audio>
+            </div>
+        </div>
+
+        <div class="stanza">
+            <div class="lyrics-block">
+                <div class="line"><span class="s4">Risin' up,</span> <span class="s1">straight to the top</span></div>
+                <div class="line"><span class="s2">Had the guts,</span> <span class="s3">got the glory</span></div>
+                <div class="line"><span class="s4">Went the distance, now I'm not gonna stop</span></div>
+                <div class="line"><span class="s1">Just a man</span> <span class="s2">and his will</span> <span class="s3">to survive</span></div>
+            </div>
+            <div class="player-card">
+                <span class="label-title">Verse 4</span>
+                <audio controls src="estrofe6.mp3"></audio>
+            </div>
+        </div>
+
+        <div class="stanza">
+            <div class="lyrics-block">
+                <div class="line"><span class="s4">It's the</span> <span class="s1">eye of the tiger, it's the thrill of the fight</span></div>
+                <div class="line"><span class="s2">Risin' up</span> <span class="s3">to the challenge of our rival</span></div>
+                <div class="line"><span class="s4">And the last</span> <span class="s1">known survivor stalks his prey in the night</span></div>
+                <div class="line"><span class="s2">And he's watching us all with the eye</span> <span class="s3">of the tiger</span></div>
+            </div>
+            <div class="player-card">
+                <span class="label-title">Chorus 3</span>
+                <audio controls src="estrofe7.mp3"></audio>
+            </div>
+        </div>
+
+        <div class="stanza">
+            <div class="lyrics-block">
+                <div class="line"><span class="s4">The eye of the tiger</span></div>
+                <div class="line"><span class="s1">The eye of the tiger</span></div>
+                <div class="line"><span class="s2">The eye of the tiger</span></div>
+                <div class="line"><span class="s3">The eye of the tiger</span></div>
+            </div>
+            <div class="player-card">
+                <span class="label-title">Ending</span>
+                <audio controls src="estrofe8.mp3"></audio>
+            </div>
+        </div>
+
+        <div class="controls-area">
+            <button id="btnLoop" class="btn-loop">
+                <span>🔁 Auto Repeat: OFF</span>
+            </button>
+            
+            <a href="mobile.html" class="btn-alt">Alternative Version</a>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const audios = document.querySelectorAll('audio');
+            const btnLoop = document.getElementById('btnLoop');
+            const btnText = btnLoop.querySelector('span');
+            let isLooping = false;
+
+            // 1. Lógica para garantir que apenas um toque por vez
+            audios.forEach(audio => {
+                audio.addEventListener('play', function() {
+                    audios.forEach(otherAudio => {
+                        if (otherAudio !== audio) {
+                            otherAudio.pause();
+                            // Não resetamos o tempo do outro para facilitar voltar de onde parou,
+                            // mas se preferir resetar, use: otherAudio.currentTime = 0;
+                        }
+                    });
+                });
+            });
+
+            // 2. Lógica do Botão de Loop
+            btnLoop.addEventListener('click', function() {
+                isLooping = !isLooping; // Inverte o estado
+
+                // Atualiza visual do botão
+                if (isLooping) {
+                    btnLoop.classList.add('active');
+                    btnText.textContent = "🔁 Auto Repeat: ON";
+                } else {
+                    btnLoop.classList.remove('active');
+                    btnText.textContent = "🔁 Auto Repeat: OFF";
+                }
+
+                // Aplica a propriedade 'loop' em todos os áudios
+                audios.forEach(audio => {
+                    audio.loop = isLooping;
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>
