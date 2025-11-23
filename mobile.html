@@ -44,7 +44,7 @@
             max-width: 800px;
             width: 100%;
             animation: fadeIn 0.8s ease-out;
-            padding-bottom: 60px; /* Espaço extra para o botão */
+            padding-bottom: 60px;
         }
 
         @keyframes fadeIn {
@@ -167,10 +167,9 @@
             background-color: rgba(255,255,255,0.05);
         }
 
-        /* Estado Ativo (Ligado) */
         .btn-loop.active {
-            background-color: var(--c1); /* Amarelo */
-            color: var(--bg-page); /* Fundo escuro */
+            background-color: var(--c1);
+            color: var(--bg-page);
             border-color: var(--c1);
             box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
         }
@@ -200,6 +199,7 @@
                 <div class="line"><span class="s1">Went the distance, now I'm back on my feet</span></div>
                 <div class="line"><span class="s2">Just a man</span> <span class="s4">and his will</span> <span class="s1">to survive</span></div>
             </div>
+            
             <div class="player-card">
                 <span class="label-title">Verse 1</span>
                 <audio controls preload="none" src="estrofe1.mp3"></audio>
@@ -213,6 +213,7 @@
                 <div class="line"><span class="s1">Don't lose your grip</span> <span class="s4">on the dreams of the past</span></div>
                 <div class="line"><span class="s1">You must fight</span> <span class="s2">just to keep</span> <span class="s3">them alive</span></div>
             </div>
+            
             <div class="player-card">
                 <span class="label-title">Verse 2</span>
                 <audio controls preload="none" src="estrofe2.mp3"></audio>
@@ -226,6 +227,7 @@
                 <div class="line"><span class="s4">And the last</span> <span class="s1">known survivor stalks his prey in the night</span></div>
                 <div class="line"><span class="s2">And he's watching us all with the eye</span> <span class="s3">of the tiger</span></div>
             </div>
+            
             <div class="player-card">
                 <span class="label-title">Chorus 1</span>
                 <audio controls preload="none" src="estrofe3.mp3"></audio>
@@ -239,6 +241,7 @@
                 <div class="line"><span class="s4">They stack the odds</span> <span class="s1">still we take to the street</span></div>
                 <div class="line"><span class="s1">For the kill,</span> <span class="s2">with the skill</span> <span class="s3">to survive</span></div>
             </div>
+            
             <div class="player-card">
                 <span class="label-title">Verse 3</span>
                 <audio controls preload="none" src="estrofe4.mp3"></audio>
@@ -252,6 +255,7 @@
                 <div class="line"><span class="s4">And the last</span> <span class="s1">known survivor stalks his prey in the night</span></div>
                 <div class="line"><span class="s2">And he's watching us all with the eye</span> <span class="s3">of the tiger</span></div>
             </div>
+            
             <div class="player-card">
                 <span class="label-title">Chorus 2</span>
                 <audio controls preload="none" src="estrofe5.mp3"></audio>
@@ -265,6 +269,7 @@
                 <div class="line"><span class="s4">Went the distance, now I'm not gonna stop</span></div>
                 <div class="line"><span class="s1">Just a man</span> <span class="s2">and his will</span> <span class="s3">to survive</span></div>
             </div>
+            
             <div class="player-card">
                 <span class="label-title">Verse 4</span>
                 <audio controls preload="none" src="estrofe6.mp3"></audio>
@@ -278,6 +283,7 @@
                 <div class="line"><span class="s4">And the last</span> <span class="s1">known survivor stalks his prey in the night</span></div>
                 <div class="line"><span class="s2">And he's watching us all with the eye</span> <span class="s3">of the tiger</span></div>
             </div>
+            
             <div class="player-card">
                 <span class="label-title">Chorus 3</span>
                 <audio controls preload="none" src="estrofe7.mp3"></audio>
@@ -291,6 +297,7 @@
                 <div class="line"><span class="s2">The eye of the tiger</span></div>
                 <div class="line"><span class="s3">The eye of the tiger</span></div>
             </div>
+            
             <div class="player-card">
                 <span class="label-title">Ending</span>
                 <audio controls preload="none" src="estrofe8.mp3"></audio>
@@ -318,8 +325,6 @@
                     audios.forEach(otherAudio => {
                         if (otherAudio !== audio) {
                             otherAudio.pause();
-                            // Não resetamos o tempo do outro para facilitar voltar de onde parou,
-                            // mas se preferir resetar, use: otherAudio.currentTime = 0;
                         }
                     });
                 });
@@ -327,9 +332,8 @@
 
             // 2. Lógica do Botão de Loop
             btnLoop.addEventListener('click', function() {
-                isLooping = !isLooping; // Inverte o estado
+                isLooping = !isLooping; 
 
-                // Atualiza visual do botão
                 if (isLooping) {
                     btnLoop.classList.add('active');
                     btnText.textContent = "🔁 Auto Repeat: ON";
@@ -338,7 +342,6 @@
                     btnText.textContent = "🔁 Auto Repeat: OFF";
                 }
 
-                // Aplica a propriedade 'loop' em todos os áudios
                 audios.forEach(audio => {
                     audio.loop = isLooping;
                 });
@@ -347,6 +350,4 @@
     </script>
 
 </body>
-
 </html>
-
