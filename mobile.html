@@ -144,6 +144,7 @@
             left: 0;
             width: 100%;
             height: 100%;
+            /* Fundo Sólido */
             background-color: var(--bg-player-box); 
             display: flex;
             align-items: center;
@@ -159,6 +160,7 @@
             border-radius: 30px;
         }
 
+        /* Hover opaco */
         .player-overlay:hover {
             background-color: #2a3455; 
             color: var(--text-white);
@@ -397,7 +399,7 @@
             const btnText = btnLoop.querySelector('span');
             let isLooping = false;
 
-            // --- Lógica da Capa INTELIGENTE (Loading Rápido) ---
+            // --- Lógica da Capa BLINDADA ---
             const overlays = document.querySelectorAll('.player-overlay');
             
             overlays.forEach(overlay => {
@@ -405,19 +407,31 @@
                     const audio = this.parentElement.querySelector('audio');
                     const textSpan = this.querySelector('span');
 
-                    // 1. Feedback Visual Imediato
-                    textSpan.textContent = "⏳ Loading...";
+                    // 1. Feedback Visual "Tentando..."
+                    textSpan.textContent = "⌛ Loading...";
                     
-                    // 2. Força o carregamento e Play
-                    audio.load(); // Adiciona robustez ao preload=none
-                    audio.play();
+                    // 2. Tenta Tocar
+                    audio.play().catch(error => {
+                        console.log("Autoplay bloqueado ou erro de rede:", error);
+                    });
 
-                    // 3. O Segredo da Velocidade: loadedmetadata
-                    // Mostra o player assim que souber a duração (segundos), 
-                    // não espera o buffer encher.
-                    audio.addEventListener('loadedmetadata', () => {
+                    // Função para esconder a capa e mostrar o player
+                    const showPlayer = () => {
                         this.classList.add('hidden');
-                    }, { once: true });
+                    };
+
+                    // 3. GATILHOS MÚLTIPLOS (Qualquer um que acontecer primeiro libera o player)
+                    
+                    // A: Se a duração carregar (ex: 0:00 -> 4:02)
+                    audio.addEventListener('durationchange', showPlayer, { once: true });
+                    
+                    // B: Se começar a tocar de fato
+                    audio.addEventListener('playing', showPlayer, { once: true });
+
+                    // C: TIMEOUT DE SEGURANÇA (A Solução Final)
+                    // Se em 2.5 segundos nada acontecer, mostra o player de qualquer jeito
+                    // para o usuário não ficar preso.
+                    setTimeout(showPlayer, 2500);
                 });
             });
 
