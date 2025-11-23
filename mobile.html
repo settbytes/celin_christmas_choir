@@ -144,7 +144,6 @@
             left: 0;
             width: 100%;
             height: 100%;
-            /* Fundo Sólido */
             background-color: var(--bg-player-box); 
             display: flex;
             align-items: center;
@@ -160,7 +159,6 @@
             border-radius: 30px;
         }
 
-        /* Hover opaco */
         .player-overlay:hover {
             background-color: #2a3455; 
             color: var(--text-white);
@@ -399,7 +397,7 @@
             const btnText = btnLoop.querySelector('span');
             let isLooping = false;
 
-            // --- Lógica da Capa INTELIGENTE (Loading) ---
+            // --- Lógica da Capa INTELIGENTE (Loading Rápido) ---
             const overlays = document.querySelectorAll('.player-overlay');
             
             overlays.forEach(overlay => {
@@ -407,17 +405,19 @@
                     const audio = this.parentElement.querySelector('audio');
                     const textSpan = this.querySelector('span');
 
-                    // 1. Feedback Visual Imediato: "Estou carregando..."
+                    // 1. Feedback Visual Imediato
                     textSpan.textContent = "⏳ Loading...";
                     
-                    // 2. Manda tocar (começa o download real)
+                    // 2. Força o carregamento e Play
+                    audio.load(); // Adiciona robustez ao preload=none
                     audio.play();
 
-                    // 3. O "Segredo": Só esconde a capa quando o áudio começar a tocar DE VERDADE.
-                    // O evento 'playing' dispara quando o som começa a sair.
-                    audio.addEventListener('playing', () => {
+                    // 3. O Segredo da Velocidade: loadedmetadata
+                    // Mostra o player assim que souber a duração (segundos), 
+                    // não espera o buffer encher.
+                    audio.addEventListener('loadedmetadata', () => {
                         this.classList.add('hidden');
-                    }, { once: true }); // once: true garante que só roda na primeira vez
+                    }, { once: true });
                 });
             });
 
