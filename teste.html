@@ -19,7 +19,7 @@
             
             --c1: #FFD700; /* Gold */
             --c2: #FF6B6B; /* Salmon */
-            --c3: #4ECDC4; /* Teal/Mint */
+            --c3: #4ECDC4; /* Teal/Mint (VERDE) */
             --c4: #5dade2; /* Blue */
 
             --text-white: #ffffff;
@@ -142,23 +142,25 @@
             justify-content: center;
         }
 
+        /* MUDANÇA AQUI: Cor da barra para verde */
         .loading-bar {
             position: absolute;
             left: 0;
             top: 0;
             height: 100%;
             width: 0%; /* JS vai mudar isso */
-            background-color: var(--c1); /* Amarelo */
-            opacity: 0.2;
+            background-color: var(--c3); /* Usando a cor Verde (Teal/Mint) */
+            opacity: 0.4; /* Aumentei um pouco a opacidade para ficar mais visível */
             transition: width 0.1s linear;
         }
 
+        /* MUDANÇA AQUI: Cor do texto para verde */
         .loading-text {
             position: relative;
             z-index: 2;
             font-size: 0.8rem;
             font-weight: 700;
-            color: var(--c1);
+            color: var(--c3); /* Texto verde para combinar */
             text-transform: uppercase;
         }
 
@@ -537,8 +539,6 @@
             }
 
             // Dispara o processo para todos os áudios
-            // Fazemos sequencial ou paralelo? Paralelo é mais rápido, mas consome mais banda junta.
-            // Para ver as porcentagens subindo bonitinho, paralelo é legal.
             audios.forEach(audio => {
                 initializeAudio(audio);
             });
