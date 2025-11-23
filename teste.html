@@ -142,25 +142,23 @@
             justify-content: center;
         }
 
-        /* MUDANÇA AQUI: Cor da barra para verde */
         .loading-bar {
             position: absolute;
             left: 0;
             top: 0;
             height: 100%;
             width: 0%; /* JS vai mudar isso */
-            background-color: var(--c3); /* Usando a cor Verde (Teal/Mint) */
-            opacity: 0.4; /* Aumentei um pouco a opacidade para ficar mais visível */
+            background-color: var(--c3); /* Verde */
+            opacity: 0.4; 
             transition: width 0.1s linear;
         }
 
-        /* MUDANÇA AQUI: Cor do texto para verde */
         .loading-text {
             position: relative;
             z-index: 2;
             font-size: 0.8rem;
             font-weight: 700;
-            color: var(--c3); /* Texto verde para combinar */
+            color: var(--c3); /* Verde */
             text-transform: uppercase;
         }
 
@@ -257,7 +255,7 @@
             <div class="wrapper-audio-box">
                 <div class="loading-container">
                     <div class="loading-bar"></div>
-                    <span class="loading-text">Waiting...</span>
+                    <span class="loading-text">Waiting in queue...</span>
                 </div>
                 <audio controls data-src="musicacompleta.mp3"></audio>
             </div>
@@ -275,7 +273,7 @@
                 <div class="wrapper-audio-box">
                     <div class="loading-container">
                         <div class="loading-bar"></div>
-                        <span class="loading-text">Waiting...</span>
+                        <span class="loading-text">Waiting in queue...</span>
                     </div>
                     <audio controls data-src="estrofe1.mp3"></audio>
                 </div>
@@ -294,7 +292,7 @@
                 <div class="wrapper-audio-box">
                     <div class="loading-container">
                         <div class="loading-bar"></div>
-                        <span class="loading-text">Waiting...</span>
+                        <span class="loading-text">Waiting in queue...</span>
                     </div>
                     <audio controls data-src="estrofe2.mp3"></audio>
                 </div>
@@ -313,7 +311,7 @@
                 <div class="wrapper-audio-box">
                     <div class="loading-container">
                         <div class="loading-bar"></div>
-                        <span class="loading-text">Waiting...</span>
+                        <span class="loading-text">Waiting in queue...</span>
                     </div>
                     <audio controls data-src="estrofe3.mp3"></audio>
                 </div>
@@ -332,7 +330,7 @@
                 <div class="wrapper-audio-box">
                     <div class="loading-container">
                         <div class="loading-bar"></div>
-                        <span class="loading-text">Waiting...</span>
+                        <span class="loading-text">Waiting in queue...</span>
                     </div>
                     <audio controls data-src="estrofe4.mp3"></audio>
                 </div>
@@ -351,7 +349,7 @@
                 <div class="wrapper-audio-box">
                     <div class="loading-container">
                         <div class="loading-bar"></div>
-                        <span class="loading-text">Waiting...</span>
+                        <span class="loading-text">Waiting in queue...</span>
                     </div>
                     <audio controls data-src="estrofe5.mp3"></audio>
                 </div>
@@ -370,7 +368,7 @@
                 <div class="wrapper-audio-box">
                     <div class="loading-container">
                         <div class="loading-bar"></div>
-                        <span class="loading-text">Waiting...</span>
+                        <span class="loading-text">Waiting in queue...</span>
                     </div>
                     <audio controls data-src="estrofe6.mp3"></audio>
                 </div>
@@ -389,7 +387,7 @@
                 <div class="wrapper-audio-box">
                     <div class="loading-container">
                         <div class="loading-bar"></div>
-                        <span class="loading-text">Waiting...</span>
+                        <span class="loading-text">Waiting in queue...</span>
                     </div>
                     <audio controls data-src="estrofe7.mp3"></audio>
                 </div>
@@ -408,7 +406,7 @@
                 <div class="wrapper-audio-box">
                     <div class="loading-container">
                         <div class="loading-bar"></div>
-                        <span class="loading-text">Waiting...</span>
+                        <span class="loading-text">Waiting in queue...</span>
                     </div>
                     <audio controls data-src="estrofe8.mp3"></audio>
                 </div>
@@ -428,13 +426,14 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', async function() {
+            // querySelectorAll pega os elementos NA ORDEM que aparecem no HTML
+            // Portanto: musica completa -> estrofe 1 -> estrofe 2 ... -> estrofe 8
             const audios = document.querySelectorAll('audio');
             const btnLoop = document.getElementById('btnLoop');
             const btnText = btnLoop.querySelector('span');
-            const statusMsg = document.getElementById('status-msg');
             let isLooping = false;
             
-            const CACHE_NAME = 'tiger-songs-v2-progress';
+            const CACHE_NAME = 'tiger-songs-v3-queue';
 
             // --- FUNÇÃO PARA MOSTRAR O PLAYER ---
             function showPlayer(audioElement) {
@@ -471,14 +470,13 @@
                         if (xhr.status === 200) {
                             const blob = xhr.response;
                             
-                            // 1. Salva no Cache para o futuro
+                            // 1. Salva no Cache
                             try {
                                 const cache = await caches.open(CACHE_NAME);
-                                // Precisamos criar um objeto Response para o Cache API
                                 const responseToCache = new Response(blob);
                                 await cache.put(url, responseToCache);
                             } catch (e) {
-                                console.warn("Cache API not supported or error saving", e);
+                                console.warn("Cache API issue", e);
                             }
 
                             // 2. Cria URL e põe no player
@@ -489,7 +487,7 @@
                             loaderText.textContent = "Ready!";
                             setTimeout(() => {
                                 showPlayer(audioElement);
-                                resolve();
+                                resolve(); // Resolve a Promise para liberar o próximo da fila
                             }, 500);
                         } else {
                             loaderText.textContent = "Error";
@@ -506,7 +504,7 @@
                 });
             }
 
-            // --- GERENCIADOR PRINCIPAL ---
+            // --- GERENCIADOR DE ÁUDIO ---
             async function initializeAudio(audioElement) {
                 const url = audioElement.getAttribute('data-src');
                 const wrapper = audioElement.parentElement;
@@ -518,7 +516,7 @@
                     const response = await cache.match(url);
 
                     if (response) {
-                        // -- CACHE HIT (Já tem salvo) --
+                        // -- CACHE HIT (Já tem) --
                         loaderText.textContent = "Loading cache...";
                         const blob = await response.blob();
                         const blobUrl = URL.createObjectURL(blob);
@@ -526,22 +524,28 @@
                         showPlayer(audioElement);
                     } else {
                         // -- CACHE MISS (Precisa baixar) --
-                        // Chama a função com XHR para ter porcentagem
                         loaderText.textContent = "0%";
+                        // Await aqui garante que só saímos dessa função quando o download terminar
                         await downloadAndCache(audioElement);
                     }
                 } catch (error) {
                     console.error("Setup error:", error);
-                    // Fallback para streaming direto se tudo falhar
+                    // Fallback
                     audioElement.src = url;
                     showPlayer(audioElement);
                 }
             }
 
-            // Dispara o processo para todos os áudios
-            audios.forEach(audio => {
-                initializeAudio(audio);
-            });
+            // --- LÓGICA DE FILA SEQUENCIAL (QUEUE) ---
+            async function processQueue() {
+                // Loop "for...of" permite usar await dentro, pausando o loop
+                for (const audio of audios) {
+                    await initializeAudio(audio);
+                }
+            }
+
+            // Inicia a fila
+            processQueue();
 
             // --- Lógica de Tocar Um por Vez ---
             audios.forEach(audio => {
