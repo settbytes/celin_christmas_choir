@@ -132,8 +132,15 @@
             width: 100%;
             height: 40px;
             outline: none;
+            /* Um pouco de transparência enquanto carrega */
+            transition: opacity 0.3s;
         }
         
+        audio.loading {
+            opacity: 0.5;
+            pointer-events: none; /* Bloqueia clique enquanto baixa */
+        }
+
         audio::-webkit-media-controls-panel {
             background-color: rgba(255, 255, 255, 0.1);
         }
@@ -181,6 +188,15 @@
             box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
         }
 
+        /* Indicador de Status */
+        #status-msg {
+            font-size: 0.8rem;
+            color: var(--c4);
+            margin-top: 10px;
+            height: 20px;
+            text-align: center;
+        }
+
         @media (max-width: 600px) {
             .line { font-size: 1.1rem; padding-left: 15px; }
             h1 { font-size: 1.8rem; }
@@ -196,7 +212,7 @@
 
         <div class="main-player-card">
             <span class="label-title">Full song</span>
-            <audio controls preload="metadata" src="musicacompleta.mp3"></audio>
+            <audio controls class="loading" data-src="musicacompleta.mp3"></audio>
         </div>
 
         <div class="stanza">
@@ -208,7 +224,7 @@
             </div>
             <div class="player-card">
                 <span class="label-title">Verse 1</span>
-                <audio controls preload="metadata" src="estrofe1.mp3"></audio>
+                <audio controls class="loading" data-src="estrofe1.mp3"></audio>
             </div>
         </div>
 
@@ -221,7 +237,7 @@
             </div>
             <div class="player-card">
                 <span class="label-title">Verse 2</span>
-                <audio controls preload="metadata" src="estrofe2.mp3"></audio>
+                <audio controls class="loading" data-src="estrofe2.mp3"></audio>
             </div>
         </div>
 
@@ -234,7 +250,7 @@
             </div>
             <div class="player-card">
                 <span class="label-title">Chorus 1</span>
-                <audio controls preload="metadata" src="estrofe3.mp3"></audio>
+                <audio controls class="loading" data-src="estrofe3.mp3"></audio>
             </div>
         </div>
 
@@ -247,7 +263,7 @@
             </div>
             <div class="player-card">
                 <span class="label-title">Verse 3</span>
-                <audio controls preload="metadata" src="estrofe4.mp3"></audio>
+                <audio controls class="loading" data-src="estrofe4.mp3"></audio>
             </div>
         </div>
 
@@ -260,7 +276,7 @@
             </div>
             <div class="player-card">
                 <span class="label-title">Chorus 2</span>
-                <audio controls preload="metadata" src="estrofe5.mp3"></audio>
+                <audio controls class="loading" data-src="estrofe5.mp3"></audio>
             </div>
         </div>
 
@@ -273,7 +289,7 @@
             </div>
             <div class="player-card">
                 <span class="label-title">Verse 4</span>
-                <audio controls preload="metadata" src="estrofe6.mp3"></audio>
+                <audio controls class="loading" data-src="estrofe6.mp3"></audio>
             </div>
         </div>
 
@@ -286,7 +302,7 @@
             </div>
             <div class="player-card">
                 <span class="label-title">Chorus 3</span>
-                <audio controls preload="metadata" src="estrofe7.mp3"></audio>
+                <audio controls class="loading" data-src="estrofe7.mp3"></audio>
             </div>
         </div>
 
@@ -299,11 +315,12 @@
             </div>
             <div class="player-card">
                 <span class="label-title">Ending</span>
-                <audio controls preload="metadata" src="estrofe8.mp3"></audio>
+                <audio controls class="loading" data-src="estrofe8.mp3"></audio>
             </div>
         </div>
 
         <div class="controls-area">
+            <div id="status-msg"></div>
             <button id="btnLoop" class="btn-loop">
                 <span>🔁 Auto Repeat: OFF</span>
             </button>
@@ -314,23 +331,74 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
             const audios = document.querySelectorAll('audio');
             const btnLoop = document.getElementById('btnLoop');
             const btnText = btnLoop.querySelector('span');
+            const statusMsg = document.getElementById('status-msg');
             let isLooping = false;
+            
+            // Nome do Cache (onde as músicas ficarão salvas no navegador)
+            const CACHE_NAME = 'tiger-songs-v1';
 
-            // --- LÓGICA DE SIMULAÇÃO DE CARREGAMENTO ---
-            // Assim que a página carrega, percorremos todos os áudios e chamamos .load()
-            // Isso força o navegador a buscar os metadados (duração) imediatamente.
-            audios.forEach(audio => {
-                audio.load();
+            // --- 1. FUNÇÃO DE CACHE INTELIGENTE ---
+            // Essa função tenta pegar do cache. Se não tiver, baixa, salva e devolve.
+            async function loadAudioFromCache(audioElement) {
+                const url = audioElement.getAttribute('data-src');
+                
+                try {
+                    // Abre o "cofre" de cache
+                    const cache = await caches.open(CACHE_NAME);
+                    
+                    // Verifica se já tem essa música
+                    let response = await cache.match(url);
+                    
+                    if (response) {
+                        // JÁ EXISTE: Transforma em Blob e põe no player
+                        // Isso é instantâneo e não usa internet
+                        const blob = await response.blob();
+                        audioElement.src = URL.createObjectURL(blob);
+                        audioElement.classList.remove('loading');
+                    } else {
+                        // NÃO EXISTE: Baixa da internet
+                        // statusMsg.textContent = "Downloading songs for offline use...";
+                        
+                        // Busca da rede
+                        const networkResponse = await fetch(url);
+                        
+                        // Clona a resposta (uma vai pro cache, outra pro player)
+                        cache.put(url, networkResponse.clone());
+                        
+                        const blob = await networkResponse.blob();
+                        audioElement.src = URL.createObjectURL(blob);
+                        audioElement.classList.remove('loading');
+                    }
+                    
+                    // Força carregar os metadados (duração) agora que temos o arquivo (ou blob)
+                    audioElement.load();
+                    
+                } catch (error) {
+                    console.error('Erro ao carregar áudio:', error);
+                    // Fallback: Se tudo der errado, usa o link direto
+                    audioElement.src = url;
+                    audioElement.classList.remove('loading');
+                }
+            }
+
+            // --- 2. INICIA O CARREGAMENTO DE TODAS ---
+            // Fazemos isso sequencialmente ou em paralelo. 
+            // Em paralelo é mais rápido para aparecer os players.
+            const loadPromises = Array.from(audios).map(audio => loadAudioFromCache(audio));
+            
+            // Aguarda (opcional, apenas para limpar msg se quiser)
+            Promise.all(loadPromises).then(() => {
+                statusMsg.textContent = "✨ Ready! Songs saved locally.";
+                setTimeout(() => { statusMsg.textContent = ""; }, 3000);
             });
 
-            // --- Lógica de exclusividade (toca um, para os outros) ---
+            // --- 3. Lógica de Tocar Um por Vez ---
             audios.forEach(audio => {
                 audio.addEventListener('play', function() {
-                    // Pausa os outros. 
                     audios.forEach(otherAudio => {
                         if (otherAudio !== audio) {
                             otherAudio.pause();
@@ -339,7 +407,7 @@
                 });
             });
 
-            // --- Lógica do Botão de Loop ---
+            // --- 4. Lógica do Botão de Loop ---
             btnLoop.addEventListener('click', function() {
                 isLooping = !isLooping; 
 
