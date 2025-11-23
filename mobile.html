@@ -16,12 +16,10 @@
             --bg-card: #252d4e;
             --bg-player-box: #181e36;
             --line-guide: #3E4C7A;
-            
-            --c1: #FFD700; /* Gold */
-            --c2: #FF6B6B; /* Salmon */
-            --c3: #4ECDC4; /* Teal/Mint */
-            --c4: #5dade2; /* Blue */
-
+            --c1: #FFD700; 
+            --c2: #FF6B6B; 
+            --c3: #4ECDC4; 
+            --c4: #5dade2; 
             --text-white: #ffffff;
             --text-muted: #8d99ae;
         }
@@ -87,13 +85,12 @@
             border-left: 3px solid var(--line-guide);
         }
 
-        /* Cores */
         .s1 { color: var(--c1); }
         .s2 { color: var(--c2); }
         .s3 { color: var(--c3); }
         .s4 { color: var(--c4); }
 
-        /* --- Players Containers --- */
+        /* --- Players --- */
         .player-card, .main-player-card {
             background-color: var(--bg-player-box);
             padding: 20px;
@@ -128,7 +125,7 @@
             color: var(--text-muted);
         }
 
-        /* --- WRAPPER E CAPA --- */
+        /* --- CAPA DO PLAYER --- */
         .audio-wrapper {
             position: relative;
             width: 100%;
@@ -166,13 +163,6 @@
             box-shadow: 0 0 10px rgba(255, 215, 0, 0.15);
         }
 
-        .player-overlay span {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        /* Ocultar a capa (quando o player está ativo) */
         .player-overlay.hidden {
             display: none;
         }
@@ -188,7 +178,7 @@
             background-color: rgba(255, 255, 255, 0.1);
         }
 
-        /* --- BOTÃO DE REPETIÇÃO --- */
+        /* --- BOTÃO DE LOOP --- */
         .controls-area {
             display: flex;
             justify-content: center;
@@ -383,89 +373,126 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const overlays = document.querySelectorAll('.player-overlay');
+            // --- 1. SISTEMA DE BANCO DE DADOS (IndexedDB) ---
+            const dbName = "AudioCacheDB";
+            const storeName = "audios";
+            let db;
+
+            // Abrir banco de dados
+            const request = indexedDB.open(dbName, 1);
+            request.onupgradeneeded = function(event) {
+                db = event.target.result;
+                if (!db.objectStoreNames.contains(storeName)) {
+                    db.createObjectStore(storeName); // Cria tabela 'audios'
+                }
+            };
+            request.onsuccess = function(event) {
+                db = event.target.result;
+            };
+            request.onerror = function(event) {
+                console.log("Erro no DB", event);
+            };
+
+            // Função para pegar áudio do cache
+            function getAudioFromCache(key) {
+                return new Promise((resolve, reject) => {
+                    if (!db) return reject("DB não pronto");
+                    const transaction = db.transaction([storeName], "readonly");
+                    const store = transaction.objectStore(storeName);
+                    const req = store.get(key);
+                    req.onsuccess = () => resolve(req.result);
+                    req.onerror = () => reject(req.error);
+                });
+            }
+
+            // Função para salvar áudio no cache
+            function saveAudioToCache(key, blob) {
+                if (!db) return;
+                const transaction = db.transaction([storeName], "readwrite");
+                const store = transaction.objectStore(storeName);
+                store.put(blob, key);
+            }
+
+            // --- 2. UI E CONTROLES ---
             const audios = document.querySelectorAll('audio');
             const btnLoop = document.getElementById('btnLoop');
             const btnText = btnLoop.querySelector('span');
             let isLooping = false;
+            const overlays = document.querySelectorAll('.player-overlay');
 
-            // Função para RESETAR e ESCONDER todos os outros players
+            // Função para parar e resetar os outros
             function stopAndResetOthers(currentAudio) {
                 audios.forEach(audio => {
                     if (audio !== currentAudio) {
-                        // 1. Pausa
                         audio.pause();
-                        
-                        // 2. RESETA O SRC (Mata o download)
-                        if (audio.getAttribute('src')) {
-                            audio.removeAttribute('src'); // Remove o link ativo
-                            audio.load(); // Força o navegador a largar o arquivo
+                        // Mata a conexão ativa
+                        if (audio.src) {
+                            audio.removeAttribute('src');
+                            audio.load();
                         }
-
-                        // 3. Volta a mostrar a Capa
+                        // Restaura a capa
                         const wrapper = audio.parentElement;
                         const overlay = wrapper.querySelector('.player-overlay');
                         const textSpan = overlay.querySelector('span');
-                        
                         if (overlay) {
                             overlay.classList.remove('hidden');
-                            // Restaura o texto original (lógica simples)
-                            // Se quiser ser mais específico, teria que salvar o texto original em data-attr
-                            // Mas aqui vamos garantir que saia do "Loading..."
-                            if(textSpan.textContent === "⌛ Loading...") {
-                                // Pequeno truque: Recarrega o texto original baseado no título do card?
-                                // Ou simplesmente deixa como estava antes. 
-                                // Como o texto original não foi perdido (só mudou o textContent),
-                                // vamos restaurar usando um atributo data que vamos criar agora.
-                                textSpan.textContent = overlay.getAttribute('data-original-text');
-                            }
+                            textSpan.textContent = overlay.getAttribute('data-original-text');
                         }
                     }
                 });
             }
 
-            // Inicializa as capas
             overlays.forEach(overlay => {
                 const textSpan = overlay.querySelector('span');
-                // Salva o texto original (ex: "▶ Play Verse 1") para poder restaurar depois
                 overlay.setAttribute('data-original-text', textSpan.textContent);
 
-                overlay.addEventListener('click', function() {
+                overlay.addEventListener('click', async function() {
                     const audio = this.parentElement.querySelector('audio');
-                    
-                    // 1. Para e Reseta TODOS os outros antes de começar este
+                    const fileKey = audio.getAttribute('data-src'); // Nome do arquivo é a chave
+
+                    // Para os outros
                     stopAndResetOthers(audio);
 
-                    // 2. Feedback Visual
+                    // Feedback Visual
                     textSpan.textContent = "⌛ Loading...";
-                    
-                    // 3. Injeta o Source (Se não tiver)
-                    if (!audio.getAttribute('src')) {
-                        audio.src = audio.getAttribute('data-src');
-                        audio.load();
-                    }
-                    
-                    // 4. Tenta Tocar
-                    const playPromise = audio.play();
 
-                    const showPlayer = () => {
+                    try {
+                        // A. Tenta pegar do Cache (IndexedDB)
+                        let blob = await getAudioFromCache(fileKey).catch(() => null);
+                        let sourceUrl;
+
+                        if (blob) {
+                            console.log("Carregado do Cache (Instantâneo):", fileKey);
+                            sourceUrl = URL.createObjectURL(blob);
+                        } else {
+                            // B. Se não tem no cache, baixa da internet (Fetch)
+                            console.log("Baixando da Internet:", fileKey);
+                            const response = await fetch(fileKey);
+                            blob = await response.blob();
+                            saveAudioToCache(fileKey, blob); // Salva para a próxima vez
+                            sourceUrl = URL.createObjectURL(blob);
+                        }
+
+                        // Define a fonte e toca
+                        audio.src = sourceUrl;
+                        
+                        // O 'play' aqui é seguro porque temos o blob inteiro
+                        await audio.play();
+                        
+                        // Esconde a capa assim que tocar com sucesso
                         this.classList.add('hidden');
-                    };
 
-                    if (playPromise !== undefined) {
-                        playPromise.then(_ => {
-                            showPlayer();
-                        })
-                        .catch(error => {
-                            console.log("Play error:", error);
-                            // Se der erro, mostra mesmo assim para permitir play manual
-                            showPlayer();
-                        });
+                    } catch (error) {
+                        console.error("Erro ao carregar áudio:", error);
+                        // Em caso de erro grave, tenta o método tradicional
+                        audio.src = fileKey;
+                        audio.play();
+                        this.classList.add('hidden');
                     }
                 });
             });
 
-            // Loop Button Logic
+            // Lógica de Loop
             btnLoop.addEventListener('click', function() {
                 isLooping = !isLooping; 
                 if (isLooping) {
