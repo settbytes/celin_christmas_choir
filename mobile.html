@@ -399,14 +399,25 @@
             const btnText = btnLoop.querySelector('span');
             let isLooping = false;
 
-            // --- Lógica da Capa (Overlay) ---
+            // --- Lógica da Capa INTELIGENTE (Loading) ---
             const overlays = document.querySelectorAll('.player-overlay');
             
             overlays.forEach(overlay => {
                 overlay.addEventListener('click', function() {
-                    this.classList.add('hidden');
                     const audio = this.parentElement.querySelector('audio');
+                    const textSpan = this.querySelector('span');
+
+                    // 1. Feedback Visual Imediato: "Estou carregando..."
+                    textSpan.textContent = "⏳ Loading...";
+                    
+                    // 2. Manda tocar (começa o download real)
                     audio.play();
+
+                    // 3. O "Segredo": Só esconde a capa quando o áudio começar a tocar DE VERDADE.
+                    // O evento 'playing' dispara quando o som começa a sair.
+                    audio.addEventListener('playing', () => {
+                        this.classList.add('hidden');
+                    }, { once: true }); // once: true garante que só roda na primeira vez
                 });
             });
 
