@@ -44,7 +44,7 @@
             max-width: 800px;
             width: 100%;
             animation: fadeIn 0.8s ease-out;
-            padding-bottom: 60px; /* Espaço extra para o botão */
+            padding-bottom: 60px;
         }
 
         @keyframes fadeIn {
@@ -148,7 +148,6 @@
             margin-top: 40px;
         }
 
-        /* Botão Loop e Botão Alternativo */
         .btn-loop, .btn-alt {
             background-color: var(--bg-player-box);
             color: var(--text-muted);
@@ -321,18 +320,18 @@
             const btnText = btnLoop.querySelector('span');
             let isLooping = false;
 
-            // 1. Lógica de Prioridade Dinâmica
+            // 1. Lógica de Players
             audios.forEach(audio => {
                 audio.addEventListener('play', function() {
-                    // Passo A: Aumenta prioridade do atual (baixa tudo o que puder)
+                    // Aumenta a prioridade da música atual para carregar rápido
                     this.preload = "auto";
 
-                    // Passo B: Pausa e corta a banda dos outros
+                    // Apenas pausa as outras para não consumir banda, 
+                    // MAS não reseta o 'src' nem 'preload' para 'none',
+                    // garantindo que a duração (ex: 0:45) continue visível.
                     audios.forEach(otherAudio => {
                         if (otherAudio !== audio) {
                             otherAudio.pause();
-                            // Muda para 'none' para o navegador parar o buffering em background
-                            otherAudio.preload = "none"; 
                         }
                     });
                 });
