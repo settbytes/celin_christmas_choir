@@ -16,10 +16,12 @@
             --bg-card: #252d4e;
             --bg-player-box: #181e36;
             --line-guide: #3E4C7A;
-            --c1: #FFD700; 
-            --c2: #FF6B6B; 
-            --c3: #4ECDC4; 
-            --c4: #5dade2; 
+            
+            --c1: #FFD700; /* Gold */
+            --c2: #FF6B6B; /* Salmon */
+            --c3: #4ECDC4; /* Teal/Mint */
+            --c4: #5dade2; /* Blue */
+
             --text-white: #ffffff;
             --text-muted: #8d99ae;
         }
@@ -85,12 +87,13 @@
             border-left: 3px solid var(--line-guide);
         }
 
+        /* Cores */
         .s1 { color: var(--c1); }
         .s2 { color: var(--c2); }
         .s3 { color: var(--c3); }
         .s4 { color: var(--c4); }
 
-        /* --- Players --- */
+        /* --- Players Containers --- */
         .player-card, .main-player-card {
             background-color: var(--bg-player-box);
             padding: 20px;
@@ -125,7 +128,7 @@
             color: var(--text-muted);
         }
 
-        /* --- CAPA DO PLAYER --- */
+        /* --- WRAPPER E CAPA --- */
         .audio-wrapper {
             position: relative;
             width: 100%;
@@ -141,6 +144,7 @@
             left: 0;
             width: 100%;
             height: 100%;
+            /* Fundo Sólido */
             background-color: var(--bg-player-box); 
             display: flex;
             align-items: center;
@@ -156,11 +160,18 @@
             border-radius: 30px;
         }
 
+        /* Hover opaco */
         .player-overlay:hover {
             background-color: #2a3455; 
             color: var(--text-white);
             border-color: var(--c1);
             box-shadow: 0 0 10px rgba(255, 215, 0, 0.15);
+        }
+
+        .player-overlay span {
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .player-overlay.hidden {
@@ -178,7 +189,7 @@
             background-color: rgba(255, 255, 255, 0.1);
         }
 
-        /* --- BOTÃO DE LOOP --- */
+        /* --- BOTÃO DE REPETIÇÃO --- */
         .controls-area {
             display: flex;
             justify-content: center;
@@ -373,126 +384,101 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // --- 1. SISTEMA DE BANCO DE DADOS (IndexedDB) ---
-            const dbName = "AudioCacheDB";
-            const storeName = "audios";
-            let db;
-
-            // Abrir banco de dados
-            const request = indexedDB.open(dbName, 1);
-            request.onupgradeneeded = function(event) {
-                db = event.target.result;
-                if (!db.objectStoreNames.contains(storeName)) {
-                    db.createObjectStore(storeName); // Cria tabela 'audios'
-                }
-            };
-            request.onsuccess = function(event) {
-                db = event.target.result;
-            };
-            request.onerror = function(event) {
-                console.log("Erro no DB", event);
-            };
-
-            // Função para pegar áudio do cache
-            function getAudioFromCache(key) {
-                return new Promise((resolve, reject) => {
-                    if (!db) return reject("DB não pronto");
-                    const transaction = db.transaction([storeName], "readonly");
-                    const store = transaction.objectStore(storeName);
-                    const req = store.get(key);
-                    req.onsuccess = () => resolve(req.result);
-                    req.onerror = () => reject(req.error);
-                });
-            }
-
-            // Função para salvar áudio no cache
-            function saveAudioToCache(key, blob) {
-                if (!db) return;
-                const transaction = db.transaction([storeName], "readwrite");
-                const store = transaction.objectStore(storeName);
-                store.put(blob, key);
-            }
-
-            // --- 2. UI E CONTROLES ---
             const audios = document.querySelectorAll('audio');
             const btnLoop = document.getElementById('btnLoop');
             const btnText = btnLoop.querySelector('span');
             let isLooping = false;
-            const overlays = document.querySelectorAll('.player-overlay');
+            
+            // Armazena o tempo de cada áudio para retomar depois
+            const audioTimes = {};
 
-            // Função para parar e resetar os outros
-            function stopAndResetOthers(currentAudio) {
-                audios.forEach(audio => {
+            // Função que para e "mata" a conexão dos outros áudios
+            function stopAndKillOthers(currentAudio) {
+                audios.forEach((audio, index) => {
                     if (audio !== currentAudio) {
+                        // 1. Salva onde parou (para retomar)
+                        if (!audio.paused && audio.currentTime > 0) {
+                            audioTimes[index] = audio.currentTime;
+                        }
+
+                        // 2. Pausa
                         audio.pause();
-                        // Mata a conexão ativa
-                        if (audio.src) {
+
+                        // 3. MATA A CONEXÃO (Remove src e força load)
+                        if (audio.getAttribute('src')) {
                             audio.removeAttribute('src');
                             audio.load();
                         }
-                        // Restaura a capa
+
+                        // 4. Restaura a capa visualmente
                         const wrapper = audio.parentElement;
                         const overlay = wrapper.querySelector('.player-overlay');
                         const textSpan = overlay.querySelector('span');
+                        
                         if (overlay) {
                             overlay.classList.remove('hidden');
+                            // Restaura texto original
                             textSpan.textContent = overlay.getAttribute('data-original-text');
                         }
                     }
                 });
             }
 
-            overlays.forEach(overlay => {
+            const overlays = document.querySelectorAll('.player-overlay');
+            
+            overlays.forEach((overlay, index) => {
                 const textSpan = overlay.querySelector('span');
+                // Salva o texto original (ex: "▶ Play Verse 1")
                 overlay.setAttribute('data-original-text', textSpan.textContent);
 
-                overlay.addEventListener('click', async function() {
+                overlay.addEventListener('click', function() {
                     const audio = this.parentElement.querySelector('audio');
-                    const fileKey = audio.getAttribute('data-src'); // Nome do arquivo é a chave
+                    
+                    // --- PARTE CRÍTICA: Mata os outros downloads ---
+                    stopAndKillOthers(audio);
 
-                    // Para os outros
-                    stopAndResetOthers(audio);
-
-                    // Feedback Visual
+                    // Feedback Visual Rápido
                     textSpan.textContent = "⌛ Loading...";
-
-                    try {
-                        // A. Tenta pegar do Cache (IndexedDB)
-                        let blob = await getAudioFromCache(fileKey).catch(() => null);
-                        let sourceUrl;
-
-                        if (blob) {
-                            console.log("Carregado do Cache (Instantâneo):", fileKey);
-                            sourceUrl = URL.createObjectURL(blob);
-                        } else {
-                            // B. Se não tem no cache, baixa da internet (Fetch)
-                            console.log("Baixando da Internet:", fileKey);
-                            const response = await fetch(fileKey);
-                            blob = await response.blob();
-                            saveAudioToCache(fileKey, blob); // Salva para a próxima vez
-                            sourceUrl = URL.createObjectURL(blob);
+                    
+                    // Injeta o Link e Toca (Streaming)
+                    if (!audio.getAttribute('src')) {
+                        audio.src = audio.getAttribute('data-src');
+                        
+                        // Tenta retomar de onde parou (se existir tempo salvo)
+                        if (audioTimes[index]) {
+                            audio.currentTime = audioTimes[index];
                         }
-
-                        // Define a fonte e toca
-                        audio.src = sourceUrl;
-                        
-                        // O 'play' aqui é seguro porque temos o blob inteiro
-                        await audio.play();
-                        
-                        // Esconde a capa assim que tocar com sucesso
-                        this.classList.add('hidden');
-
-                    } catch (error) {
-                        console.error("Erro ao carregar áudio:", error);
-                        // Em caso de erro grave, tenta o método tradicional
-                        audio.src = fileKey;
-                        audio.play();
-                        this.classList.add('hidden');
                     }
+                    
+                    // Tocar
+                    const playPromise = audio.play();
+
+                    if (playPromise !== undefined) {
+                        playPromise.then(_ => {
+                            // Sucesso: O áudio começou a chegar (buffering)
+                            // Esconde a capa SÓ quando realmente tiver dados para tocar (playing)
+                            // Isso evita o 0:00 / 0:00 visível por muito tempo
+                        })
+                        .catch(error => {
+                            console.log("Erro no play:", error);
+                        });
+                    }
+
+                    // Evento para esconder a capa assim que o áudio estiver "audível"
+                    // 'playing' dispara quando o áudio realmente começa a sair som ou está pronto para sair.
+                    audio.addEventListener('playing', () => {
+                        this.classList.add('hidden');
+                    }, { once: true });
+                    
+                    // Fallback: Se a internet for lenta, mostra o player nativo (com loader) após 1s
+                    // para o usuário ver que está carregando, em vez de ficar só no texto "Loading..."
+                    setTimeout(() => {
+                        this.classList.add('hidden');
+                    }, 1000);
                 });
             });
 
-            // Lógica de Loop
+            // Loop
             btnLoop.addEventListener('click', function() {
                 isLooping = !isLooping; 
                 if (isLooping) {
