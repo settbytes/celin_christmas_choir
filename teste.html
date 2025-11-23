@@ -323,12 +323,9 @@
             // 1. Lógica de Players
             audios.forEach(audio => {
                 audio.addEventListener('play', function() {
-                    // Aumenta a prioridade da música atual para carregar rápido
-                    this.preload = "auto";
-
-                    // Apenas pausa as outras para não consumir banda, 
-                    // MAS não reseta o 'src' nem 'preload' para 'none',
-                    // garantindo que a duração (ex: 0:45) continue visível.
+                    
+                    // Pausa os outros. 
+                    // NÃO alteramos o preload para 'none' aqui para não zerar o tempo exibido.
                     audios.forEach(otherAudio => {
                         if (otherAudio !== audio) {
                             otherAudio.pause();
