@@ -44,7 +44,7 @@
             max-width: 800px;
             width: 100%;
             animation: fadeIn 0.8s ease-out;
-            padding-bottom: 60px; /* Espaço extra para o botão */
+            padding-bottom: 60px;
         }
 
         @keyframes fadeIn {
@@ -167,10 +167,9 @@
             background-color: rgba(255,255,255,0.05);
         }
 
-        /* Estado Ativo (Ligado) */
         .btn-loop.active {
-            background-color: var(--c1); /* Amarelo */
-            color: var(--bg-page); /* Fundo escuro */
+            background-color: var(--c1);
+            color: var(--bg-page);
             border-color: var(--c1);
             box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
         }
@@ -190,9 +189,7 @@
 
         <div class="main-player-card">
             <span class="label-title">Full song</span>
-            <audio controls preload="metadata">
-                <source src="musicacompleta.mp3" type="audio/mpeg">
-            </audio>
+            <audio controls preload="none" src="musicacompleta.mp3"></audio>
         </div>
 
         <div class="stanza">
@@ -205,9 +202,7 @@
             
             <div class="player-card">
                 <span class="label-title">Verse 1</span>
-                <audio controls preload="metadata">
-                    <source src="estrofe1.mp3" type="audio/mpeg">
-                </audio>
+                <audio controls preload="none" src="estrofe1.mp3"></audio>
             </div>
         </div>
 
@@ -221,9 +216,7 @@
             
             <div class="player-card">
                 <span class="label-title">Verse 2</span>
-                <audio controls preload="metadata">
-                    <source src="estrofe2.mp3" type="audio/mpeg">
-                </audio>
+                <audio controls preload="none" src="estrofe2.mp3"></audio>
             </div>
         </div>
 
@@ -237,9 +230,7 @@
             
             <div class="player-card">
                 <span class="label-title">Chorus 1</span>
-                <audio controls preload="metadata">
-                    <source src="estrofe3.mp3" type="audio/mpeg">
-                </audio>
+                <audio controls preload="none" src="estrofe3.mp3"></audio>
             </div>
         </div>
 
@@ -253,9 +244,7 @@
             
             <div class="player-card">
                 <span class="label-title">Verse 3</span>
-                <audio controls preload="metadata">
-                    <source src="estrofe4.mp3" type="audio/mpeg">
-                </audio>
+                <audio controls preload="none" src="estrofe4.mp3"></audio>
             </div>
         </div>
 
@@ -269,9 +258,7 @@
             
             <div class="player-card">
                 <span class="label-title">Chorus 2</span>
-                <audio controls preload="metadata">
-                    <source src="estrofe5.mp3" type="audio/mpeg">
-                </audio>
+                <audio controls preload="none" src="estrofe5.mp3"></audio>
             </div>
         </div>
 
@@ -285,9 +272,7 @@
             
             <div class="player-card">
                 <span class="label-title">Verse 4</span>
-                <audio controls preload="metadata">
-                    <source src="estrofe6.mp3" type="audio/mpeg">
-                </audio>
+                <audio controls preload="none" src="estrofe6.mp3"></audio>
             </div>
         </div>
 
@@ -301,9 +286,7 @@
             
             <div class="player-card">
                 <span class="label-title">Chorus 3</span>
-                <audio controls preload="metadata">
-                    <source src="estrofe7.mp3" type="audio/mpeg">
-                </audio>
+                <audio controls preload="none" src="estrofe7.mp3"></audio>
             </div>
         </div>
 
@@ -317,9 +300,7 @@
             
             <div class="player-card">
                 <span class="label-title">Ending</span>
-                <audio controls preload="metadata">
-                    <source src="estrofe8.mp3" type="audio/mpeg">
-                </audio>
+                <audio controls preload="none" src="estrofe8.mp3"></audio>
             </div>
         </div>
 
@@ -344,8 +325,6 @@
                     audios.forEach(otherAudio => {
                         if (otherAudio !== audio) {
                             otherAudio.pause();
-                            // Não resetamos o tempo do outro para facilitar voltar de onde parou,
-                            // mas se preferir resetar, use: otherAudio.currentTime = 0;
                         }
                     });
                 });
@@ -353,9 +332,8 @@
 
             // 2. Lógica do Botão de Loop
             btnLoop.addEventListener('click', function() {
-                isLooping = !isLooping; // Inverte o estado
+                isLooping = !isLooping; 
 
-                // Atualiza visual do botão
                 if (isLooping) {
                     btnLoop.classList.add('active');
                     btnText.textContent = "🔁 Auto Repeat: ON";
@@ -364,7 +342,6 @@
                     btnText.textContent = "🔁 Auto Repeat: OFF";
                 }
 
-                // Aplica a propriedade 'loop' em todos os áudios
                 audios.forEach(audio => {
                     audio.loop = isLooping;
                 });
