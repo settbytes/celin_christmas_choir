@@ -261,6 +261,7 @@
                 <div class="line"><span class="s1">Went the distance, now I'm back on my feet</span></div>
                 <div class="line"><span class="s2">Just a man</span> <span class="s4">and his will</span> <span class="s1">to survive</span></div>
             </div>
+            
             <div class="player-card">
                 <span class="label-title">Verse 1</span>
                 <div class="audio-wrapper">
@@ -277,6 +278,7 @@
                 <div class="line"><span class="s1">Don't lose your grip</span> <span class="s4">on the dreams of the past</span></div>
                 <div class="line"><span class="s1">You must fight</span> <span class="s2">just to keep</span> <span class="s3">them alive</span></div>
             </div>
+            
             <div class="player-card">
                 <span class="label-title">Verse 2</span>
                 <div class="audio-wrapper">
@@ -293,6 +295,7 @@
                 <div class="line"><span class="s4">And the last</span> <span class="s1">known survivor stalks his prey in the night</span></div>
                 <div class="line"><span class="s2">And he's watching us all with the eye</span> <span class="s3">of the tiger</span></div>
             </div>
+            
             <div class="player-card">
                 <span class="label-title">Chorus 1</span>
                 <div class="audio-wrapper">
@@ -309,6 +312,7 @@
                 <div class="line"><span class="s4">They stack the odds</span> <span class="s1">still we take to the street</span></div>
                 <div class="line"><span class="s1">For the kill,</span> <span class="s2">with the skill</span> <span class="s3">to survive</span></div>
             </div>
+            
             <div class="player-card">
                 <span class="label-title">Verse 3</span>
                 <div class="audio-wrapper">
@@ -325,6 +329,7 @@
                 <div class="line"><span class="s4">And the last</span> <span class="s1">known survivor stalks his prey in the night</span></div>
                 <div class="line"><span class="s2">And he's watching us all with the eye</span> <span class="s3">of the tiger</span></div>
             </div>
+            
             <div class="player-card">
                 <span class="label-title">Chorus 2</span>
                 <div class="audio-wrapper">
@@ -341,6 +346,7 @@
                 <div class="line"><span class="s4">Went the distance, now I'm not gonna stop</span></div>
                 <div class="line"><span class="s1">Just a man</span> <span class="s2">and his will</span> <span class="s3">to survive</span></div>
             </div>
+            
             <div class="player-card">
                 <span class="label-title">Verse 4</span>
                 <div class="audio-wrapper">
@@ -357,6 +363,7 @@
                 <div class="line"><span class="s4">And the last</span> <span class="s1">known survivor stalks his prey in the night</span></div>
                 <div class="line"><span class="s2">And he's watching us all with the eye</span> <span class="s3">of the tiger</span></div>
             </div>
+            
             <div class="player-card">
                 <span class="label-title">Chorus 3</span>
                 <div class="audio-wrapper">
@@ -373,6 +380,7 @@
                 <div class="line"><span class="s2">The eye of the tiger</span></div>
                 <div class="line"><span class="s3">The eye of the tiger</span></div>
             </div>
+            
             <div class="player-card">
                 <span class="label-title">Ending</span>
                 <div class="audio-wrapper">
@@ -402,11 +410,11 @@
             // Armazena o tempo de cada áudio para retomar depois
             const audioTimes = {};
 
-            // Função que para e "mata" a conexão dos outros áudios
+            // Função que para e "mata" a conexão dos outros áudios para liberar a banda
             function stopAndKillOthers(currentAudio) {
                 audios.forEach((audio, index) => {
                     if (audio !== currentAudio) {
-                        // 1. Salva onde parou (para retomar)
+                        // 1. Salva onde parou (para retomar depois, se quiser)
                         if (!audio.paused && audio.currentTime > 0) {
                             audioTimes[index] = audio.currentTime;
                         }
@@ -414,7 +422,8 @@
                         // 2. Pausa
                         audio.pause();
 
-                        // 3. MATA A CONEXÃO (Remove src e força load)
+                        // 3. MATA A CONEXÃO (Crucial para Streaming rápido)
+                        // Remove o src e força o load() para o navegador parar de baixar este arquivo
                         if (audio.getAttribute('src')) {
                             audio.removeAttribute('src');
                             audio.load();
@@ -427,8 +436,10 @@
                         
                         if (overlay) {
                             overlay.classList.remove('hidden');
-                            // Restaura texto original
-                            textSpan.textContent = overlay.getAttribute('data-original-text');
+                            // Restaura texto original se existir
+                            if (overlay.hasAttribute('data-original-text')) {
+                                textSpan.textContent = overlay.getAttribute('data-original-text');
+                            }
                         }
                     }
                 });
@@ -437,12 +448,13 @@
             const overlays = document.querySelectorAll('.player-overlay');
             
             overlays.forEach((overlay, index) => {
+                const audio = overlay.parentElement.querySelector('audio');
                 const textSpan = overlay.querySelector('span');
+                
                 // Salva o texto original (ex: "▶ Play Verse 1")
                 overlay.setAttribute('data-original-text', textSpan.textContent);
 
                 overlay.addEventListener('click', function() {
-                    const audio = this.parentElement.querySelector('audio');
                     
                     // --- PARTE CRÍTICA: Mata os outros downloads ---
                     stopAndKillOthers(audio);
@@ -450,13 +462,17 @@
                     // Feedback Visual Rápido
                     textSpan.textContent = "⌛ Loading...";
                     
-                    // Injeta o Link e Toca (Streaming)
+                    // Injeta o Link e Inicia o Streaming
                     if (!audio.getAttribute('src')) {
                         audio.src = audio.getAttribute('data-src');
                         
-                        // Tenta retomar de onde parou (se existir tempo salvo)
+                        // Lógica segura para retomar o tempo (Resume)
+                        // Só definimos o tempo quando os metadados carregarem para evitar erros
                         if (audioTimes[index]) {
-                            audio.currentTime = audioTimes[index];
+                            audio.addEventListener('loadedmetadata', function setTime() {
+                                audio.currentTime = audioTimes[index];
+                                audio.removeEventListener('loadedmetadata', setTime);
+                            }, { once: true });
                         }
                     }
                     
@@ -465,26 +481,15 @@
 
                     if (playPromise !== undefined) {
                         playPromise.then(_ => {
-                            // Sucesso: O áudio começou a chegar (buffering)
-                            // Esconde a capa SÓ quando realmente tiver dados para tocar (playing)
-                            // Isso evita o 0:00 / 0:00 visível por muito tempo
+                            // Sucesso: O streaming começou e o áudio vai tocar.
+                            // Removemos o overlay imediatamente.
+                            this.classList.add('hidden');
                         })
                         .catch(error => {
-                            console.log("Erro no play:", error);
+                            console.log("Erro ou bloqueio no play:", error);
+                            textSpan.textContent = "⚠️ Error (Click again)";
                         });
                     }
-
-                    // Evento para esconder a capa assim que o áudio estiver "audível"
-                    // 'playing' dispara quando o áudio realmente começa a sair som ou está pronto para sair.
-                    audio.addEventListener('playing', () => {
-                        this.classList.add('hidden');
-                    }, { once: true });
-                    
-                    // Fallback: Se a internet for lenta, mostra o player nativo (com loader) após 1s
-                    // para o usuário ver que está carregando, em vez de ficar só no texto "Loading..."
-                    setTimeout(() => {
-                        this.classList.add('hidden');
-                    }, 1000);
                 });
             });
 
