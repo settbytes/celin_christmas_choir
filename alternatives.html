@@ -148,8 +148,8 @@
             margin-top: 40px;
         }
 
-        /* Botão Loop */
-        .btn-loop {
+        /* Botão Loop e Botão Alternativo (Estilo Unificado) */
+        .btn-loop, .btn-alt {
             background-color: var(--bg-player-box);
             color: var(--text-muted);
             border: 2px solid var(--line-guide);
@@ -164,13 +164,14 @@
             letter-spacing: 1px;
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 10px;
             width: 100%; /* Ocupa largura em telas pequenas */
             max-width: 300px;
-            justify-content: center;
+            text-decoration: none; /* Remove sublinhado do link */
         }
 
-        .btn-loop:hover {
+        .btn-loop:hover, .btn-alt:hover {
             background-color: rgba(255,255,255,0.05);
         }
 
@@ -181,31 +182,10 @@
             box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
         }
 
-        /* Novo Botão (Link) Alternativo */
-        .btn-alt {
-            text-decoration: none;
-            color: var(--text-muted);
-            border: 1px solid var(--line-guide);
-            padding: 12px 25px;
-            border-radius: 50px;
-            font-weight: 700;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.3s ease;
-            background: transparent;
-        }
-
-        .btn-alt:hover {
-            color: var(--c4); /* Azul */
-            border-color: var(--c4);
-            background-color: rgba(93, 173, 226, 0.1);
-        }
-
         @media (max-width: 600px) {
             .line { font-size: 1.1rem; padding-left: 15px; }
             h1 { font-size: 1.8rem; }
-            .btn-loop { width: 100%; }
+            .btn-loop, .btn-alt { width: 100%; }
         }
     </style>
 </head>
