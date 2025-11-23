@@ -189,14 +189,18 @@
             background-color: rgba(255, 255, 255, 0.1);
         }
 
-        /* --- BOTÃO DE REPETIÇÃO --- */
+        /* --- ÁREA DE CONTROLES (Rodapé) --- */
         .controls-area {
             display: flex;
             justify-content: center;
+            align-items: center;
+            flex-direction: column; /* Empilha os botões */
+            gap: 20px; /* Espaço entre eles */
             margin-top: 40px;
         }
 
-        .btn-loop {
+        /* Estilo unificado para Loop e Botão Padrão */
+        .btn-loop, .btn-alt {
             background-color: var(--bg-player-box);
             color: var(--text-muted);
             border: 2px solid var(--line-guide);
@@ -211,10 +215,14 @@
             letter-spacing: 1px;
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 10px;
+            width: 100%;
+            max-width: 300px;
+            text-decoration: none; /* Remove sublinhado do link */
         }
 
-        .btn-loop:hover {
+        .btn-loop:hover, .btn-alt:hover {
             background-color: rgba(255,255,255,0.05);
         }
 
@@ -228,7 +236,7 @@
         @media (max-width: 600px) {
             .line { font-size: 1.1rem; padding-left: 15px; }
             h1 { font-size: 1.8rem; }
-            .btn-loop { width: 100%; justify-content: center; }
+            .btn-loop, .btn-alt { width: 100%; }
         }
     </style>
 </head>
@@ -378,6 +386,8 @@
             <button id="btnLoop" class="btn-loop">
                 <span>🔁 Auto Repeat: OFF</span>
             </button>
+            
+            <a href="index.html" class="btn-alt">Standard Version</a>
         </div>
 
     </div>
