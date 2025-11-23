@@ -172,8 +172,9 @@
             gap: 8px;
         }
 
+        /* Ocultar a capa (quando o player está ativo) */
         .player-overlay.hidden {
-            display: none; /* Remove totalmente do fluxo */
+            display: none;
         }
 
         audio {
@@ -238,7 +239,6 @@
 
         <div class="main-player-card">
             <span class="label-title">Full song</span>
-            
             <div class="audio-wrapper">
                 <div class="player-overlay"><span>▶ Play Full Song</span></div>
                 <audio controls preload="none" data-src="musicacompleta.mp3"></audio>
@@ -252,7 +252,6 @@
                 <div class="line"><span class="s1">Went the distance, now I'm back on my feet</span></div>
                 <div class="line"><span class="s2">Just a man</span> <span class="s4">and his will</span> <span class="s1">to survive</span></div>
             </div>
-            
             <div class="player-card">
                 <span class="label-title">Verse 1</span>
                 <div class="audio-wrapper">
@@ -269,7 +268,6 @@
                 <div class="line"><span class="s1">Don't lose your grip</span> <span class="s4">on the dreams of the past</span></div>
                 <div class="line"><span class="s1">You must fight</span> <span class="s2">just to keep</span> <span class="s3">them alive</span></div>
             </div>
-            
             <div class="player-card">
                 <span class="label-title">Verse 2</span>
                 <div class="audio-wrapper">
@@ -286,7 +284,6 @@
                 <div class="line"><span class="s4">And the last</span> <span class="s1">known survivor stalks his prey in the night</span></div>
                 <div class="line"><span class="s2">And he's watching us all with the eye</span> <span class="s3">of the tiger</span></div>
             </div>
-            
             <div class="player-card">
                 <span class="label-title">Chorus 1</span>
                 <div class="audio-wrapper">
@@ -303,7 +300,6 @@
                 <div class="line"><span class="s4">They stack the odds</span> <span class="s1">still we take to the street</span></div>
                 <div class="line"><span class="s1">For the kill,</span> <span class="s2">with the skill</span> <span class="s3">to survive</span></div>
             </div>
-            
             <div class="player-card">
                 <span class="label-title">Verse 3</span>
                 <div class="audio-wrapper">
@@ -320,7 +316,6 @@
                 <div class="line"><span class="s4">And the last</span> <span class="s1">known survivor stalks his prey in the night</span></div>
                 <div class="line"><span class="s2">And he's watching us all with the eye</span> <span class="s3">of the tiger</span></div>
             </div>
-            
             <div class="player-card">
                 <span class="label-title">Chorus 2</span>
                 <div class="audio-wrapper">
@@ -337,7 +332,6 @@
                 <div class="line"><span class="s4">Went the distance, now I'm not gonna stop</span></div>
                 <div class="line"><span class="s1">Just a man</span> <span class="s2">and his will</span> <span class="s3">to survive</span></div>
             </div>
-            
             <div class="player-card">
                 <span class="label-title">Verse 4</span>
                 <div class="audio-wrapper">
@@ -354,7 +348,6 @@
                 <div class="line"><span class="s4">And the last</span> <span class="s1">known survivor stalks his prey in the night</span></div>
                 <div class="line"><span class="s2">And he's watching us all with the eye</span> <span class="s3">of the tiger</span></div>
             </div>
-            
             <div class="player-card">
                 <span class="label-title">Chorus 3</span>
                 <div class="audio-wrapper">
@@ -371,7 +364,6 @@
                 <div class="line"><span class="s2">The eye of the tiger</span></div>
                 <div class="line"><span class="s3">The eye of the tiger</span></div>
             </div>
-            
             <div class="player-card">
                 <span class="label-title">Ending</span>
                 <div class="audio-wrapper">
@@ -391,62 +383,91 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            const overlays = document.querySelectorAll('.player-overlay');
             const audios = document.querySelectorAll('audio');
             const btnLoop = document.getElementById('btnLoop');
             const btnText = btnLoop.querySelector('span');
             let isLooping = false;
 
-            const overlays = document.querySelectorAll('.player-overlay');
-            
+            // Função para RESETAR e ESCONDER todos os outros players
+            function stopAndResetOthers(currentAudio) {
+                audios.forEach(audio => {
+                    if (audio !== currentAudio) {
+                        // 1. Pausa
+                        audio.pause();
+                        
+                        // 2. RESETA O SRC (Mata o download)
+                        if (audio.getAttribute('src')) {
+                            audio.removeAttribute('src'); // Remove o link ativo
+                            audio.load(); // Força o navegador a largar o arquivo
+                        }
+
+                        // 3. Volta a mostrar a Capa
+                        const wrapper = audio.parentElement;
+                        const overlay = wrapper.querySelector('.player-overlay');
+                        const textSpan = overlay.querySelector('span');
+                        
+                        if (overlay) {
+                            overlay.classList.remove('hidden');
+                            // Restaura o texto original (lógica simples)
+                            // Se quiser ser mais específico, teria que salvar o texto original em data-attr
+                            // Mas aqui vamos garantir que saia do "Loading..."
+                            if(textSpan.textContent === "⌛ Loading...") {
+                                // Pequeno truque: Recarrega o texto original baseado no título do card?
+                                // Ou simplesmente deixa como estava antes. 
+                                // Como o texto original não foi perdido (só mudou o textContent),
+                                // vamos restaurar usando um atributo data que vamos criar agora.
+                                textSpan.textContent = overlay.getAttribute('data-original-text');
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Inicializa as capas
             overlays.forEach(overlay => {
+                const textSpan = overlay.querySelector('span');
+                // Salva o texto original (ex: "▶ Play Verse 1") para poder restaurar depois
+                overlay.setAttribute('data-original-text', textSpan.textContent);
+
                 overlay.addEventListener('click', function() {
                     const audio = this.parentElement.querySelector('audio');
-                    const textSpan = this.querySelector('span');
                     
-                    // Feedback visual rápido
+                    // 1. Para e Reseta TODOS os outros antes de começar este
+                    stopAndResetOthers(audio);
+
+                    // 2. Feedback Visual
                     textSpan.textContent = "⌛ Loading...";
                     
-                    // 1. CARREGAR: Se não tem src, injeta agora
-                    if (!audio.src || audio.src === window.location.href) {
+                    // 3. Injeta o Source (Se não tiver)
+                    if (!audio.getAttribute('src')) {
                         audio.src = audio.getAttribute('data-src');
                         audio.load();
                     }
-
-                    // 2. PLAY: Tenta tocar
+                    
+                    // 4. Tenta Tocar
                     const playPromise = audio.play();
 
-                    // 3. AÇÃO DE SUCESSO: Assim que a promessa de play for resolvida
+                    const showPlayer = () => {
+                        this.classList.add('hidden');
+                    };
+
                     if (playPromise !== undefined) {
                         playPromise.then(_ => {
-                            // Se começou a tocar com sucesso, esconde a capa imediatamente
-                            this.classList.add('hidden');
+                            showPlayer();
                         })
                         .catch(error => {
-                            // Se der erro (bloqueio de autoplay), também esconde a capa
-                            // para o usuário poder usar o controle nativo
-                            console.log("Autoplay prevented or loading error");
-                            this.classList.add('hidden');
+                            console.log("Play error:", error);
+                            // Se der erro, mostra mesmo assim para permitir play manual
+                            showPlayer();
                         });
                     }
                 });
             });
 
-
-            // --- Lógica Padrão: Um por vez ---
-            audios.forEach(audio => {
-                audio.addEventListener('play', function() {
-                    audios.forEach(otherAudio => {
-                        if (otherAudio !== audio) {
-                            otherAudio.pause();
-                        }
-                    });
-                });
-            });
-
-            // --- Botão de Loop ---
+            // Loop Button Logic
             btnLoop.addEventListener('click', function() {
                 isLooping = !isLooping; 
-
                 if (isLooping) {
                     btnLoop.classList.add('active');
                     btnText.textContent = "🔁 Auto Repeat: ON";
@@ -454,7 +475,6 @@
                     btnLoop.classList.remove('active');
                     btnText.textContent = "🔁 Auto Repeat: OFF";
                 }
-
                 audios.forEach(audio => {
                     audio.loop = isLooping;
                 });
