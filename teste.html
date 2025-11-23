@@ -93,7 +93,7 @@
         .s3 { color: var(--c3); }
         .s4 { color: var(--c4); }
 
-        /* --- Players --- */
+        /* --- Players Containers --- */
         .player-card, .main-player-card {
             background-color: var(--bg-player-box);
             padding: 20px;
@@ -128,17 +128,56 @@
             color: var(--text-muted);
         }
 
+        /* --- PROGRESS BAR STYLES (LOADER) --- */
+        .loading-container {
+            width: 100%;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .loading-bar {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 0%; /* JS vai mudar isso */
+            background-color: var(--c1); /* Amarelo */
+            opacity: 0.2;
+            transition: width 0.1s linear;
+        }
+
+        .loading-text {
+            position: relative;
+            z-index: 2;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--c1);
+            text-transform: uppercase;
+        }
+
+        /* Oculta o player enquanto carrega */
         audio {
             width: 100%;
             height: 40px;
             outline: none;
-            /* Um pouco de transparência enquanto carrega */
-            transition: opacity 0.3s;
+            display: none; /* Começa escondido */
         }
         
-        audio.loading {
-            opacity: 0.5;
-            pointer-events: none; /* Bloqueia clique enquanto baixa */
+        /* Classe para mostrar o player */
+        audio.ready {
+            display: block;
+        }
+        
+        /* Classe para esconder o loader */
+        .loading-container.hidden {
+            display: none;
         }
 
         audio::-webkit-media-controls-panel {
@@ -188,7 +227,7 @@
             box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
         }
 
-        /* Indicador de Status */
+        /* Indicador de Status Global */
         #status-msg {
             font-size: 0.8rem;
             color: var(--c4);
@@ -212,7 +251,14 @@
 
         <div class="main-player-card">
             <span class="label-title">Full song</span>
-            <audio controls class="loading" data-src="musicacompleta.mp3"></audio>
+            
+            <div class="wrapper-audio-box">
+                <div class="loading-container">
+                    <div class="loading-bar"></div>
+                    <span class="loading-text">Waiting...</span>
+                </div>
+                <audio controls data-src="musicacompleta.mp3"></audio>
+            </div>
         </div>
 
         <div class="stanza">
@@ -224,7 +270,13 @@
             </div>
             <div class="player-card">
                 <span class="label-title">Verse 1</span>
-                <audio controls class="loading" data-src="estrofe1.mp3"></audio>
+                <div class="wrapper-audio-box">
+                    <div class="loading-container">
+                        <div class="loading-bar"></div>
+                        <span class="loading-text">Waiting...</span>
+                    </div>
+                    <audio controls data-src="estrofe1.mp3"></audio>
+                </div>
             </div>
         </div>
 
@@ -237,7 +289,13 @@
             </div>
             <div class="player-card">
                 <span class="label-title">Verse 2</span>
-                <audio controls class="loading" data-src="estrofe2.mp3"></audio>
+                <div class="wrapper-audio-box">
+                    <div class="loading-container">
+                        <div class="loading-bar"></div>
+                        <span class="loading-text">Waiting...</span>
+                    </div>
+                    <audio controls data-src="estrofe2.mp3"></audio>
+                </div>
             </div>
         </div>
 
@@ -250,7 +308,13 @@
             </div>
             <div class="player-card">
                 <span class="label-title">Chorus 1</span>
-                <audio controls class="loading" data-src="estrofe3.mp3"></audio>
+                <div class="wrapper-audio-box">
+                    <div class="loading-container">
+                        <div class="loading-bar"></div>
+                        <span class="loading-text">Waiting...</span>
+                    </div>
+                    <audio controls data-src="estrofe3.mp3"></audio>
+                </div>
             </div>
         </div>
 
@@ -263,7 +327,13 @@
             </div>
             <div class="player-card">
                 <span class="label-title">Verse 3</span>
-                <audio controls class="loading" data-src="estrofe4.mp3"></audio>
+                <div class="wrapper-audio-box">
+                    <div class="loading-container">
+                        <div class="loading-bar"></div>
+                        <span class="loading-text">Waiting...</span>
+                    </div>
+                    <audio controls data-src="estrofe4.mp3"></audio>
+                </div>
             </div>
         </div>
 
@@ -276,7 +346,13 @@
             </div>
             <div class="player-card">
                 <span class="label-title">Chorus 2</span>
-                <audio controls class="loading" data-src="estrofe5.mp3"></audio>
+                <div class="wrapper-audio-box">
+                    <div class="loading-container">
+                        <div class="loading-bar"></div>
+                        <span class="loading-text">Waiting...</span>
+                    </div>
+                    <audio controls data-src="estrofe5.mp3"></audio>
+                </div>
             </div>
         </div>
 
@@ -289,7 +365,13 @@
             </div>
             <div class="player-card">
                 <span class="label-title">Verse 4</span>
-                <audio controls class="loading" data-src="estrofe6.mp3"></audio>
+                <div class="wrapper-audio-box">
+                    <div class="loading-container">
+                        <div class="loading-bar"></div>
+                        <span class="loading-text">Waiting...</span>
+                    </div>
+                    <audio controls data-src="estrofe6.mp3"></audio>
+                </div>
             </div>
         </div>
 
@@ -302,7 +384,13 @@
             </div>
             <div class="player-card">
                 <span class="label-title">Chorus 3</span>
-                <audio controls class="loading" data-src="estrofe7.mp3"></audio>
+                <div class="wrapper-audio-box">
+                    <div class="loading-container">
+                        <div class="loading-bar"></div>
+                        <span class="loading-text">Waiting...</span>
+                    </div>
+                    <audio controls data-src="estrofe7.mp3"></audio>
+                </div>
             </div>
         </div>
 
@@ -315,7 +403,13 @@
             </div>
             <div class="player-card">
                 <span class="label-title">Ending</span>
-                <audio controls class="loading" data-src="estrofe8.mp3"></audio>
+                <div class="wrapper-audio-box">
+                    <div class="loading-container">
+                        <div class="loading-bar"></div>
+                        <span class="loading-text">Waiting...</span>
+                    </div>
+                    <audio controls data-src="estrofe8.mp3"></audio>
+                </div>
             </div>
         </div>
 
@@ -338,65 +432,118 @@
             const statusMsg = document.getElementById('status-msg');
             let isLooping = false;
             
-            // Nome do Cache (onde as músicas ficarão salvas no navegador)
-            const CACHE_NAME = 'tiger-songs-v1';
+            const CACHE_NAME = 'tiger-songs-v2-progress';
 
-            // --- 1. FUNÇÃO DE CACHE INTELIGENTE ---
-            // Essa função tenta pegar do cache. Se não tiver, baixa, salva e devolve.
-            async function loadAudioFromCache(audioElement) {
+            // --- FUNÇÃO PARA MOSTRAR O PLAYER ---
+            function showPlayer(audioElement) {
+                const wrapper = audioElement.parentElement;
+                const loader = wrapper.querySelector('.loading-container');
+                loader.classList.add('hidden');
+                audioElement.classList.add('ready');
+            }
+
+            // --- FUNÇÃO DE DOWNLOAD COM PORCENTAGEM (XHR) ---
+            function downloadAndCache(audioElement) {
+                return new Promise((resolve, reject) => {
+                    const url = audioElement.getAttribute('data-src');
+                    const wrapper = audioElement.parentElement;
+                    const loaderBar = wrapper.querySelector('.loading-bar');
+                    const loaderText = wrapper.querySelector('.loading-text');
+
+                    const xhr = new XMLHttpRequest();
+                    xhr.open('GET', url, true);
+                    xhr.responseType = 'blob';
+
+                    // EVENTO DE PROGRESSO (Atualiza a barra e o texto)
+                    xhr.onprogress = (event) => {
+                        if (event.lengthComputable) {
+                            const percentComplete = Math.round((event.loaded / event.total) * 100);
+                            loaderText.textContent = `Loading: ${percentComplete}%`;
+                            loaderBar.style.width = `${percentComplete}%`;
+                        } else {
+                            loaderText.textContent = `Loading...`;
+                        }
+                    };
+
+                    xhr.onload = async () => {
+                        if (xhr.status === 200) {
+                            const blob = xhr.response;
+                            
+                            // 1. Salva no Cache para o futuro
+                            try {
+                                const cache = await caches.open(CACHE_NAME);
+                                // Precisamos criar um objeto Response para o Cache API
+                                const responseToCache = new Response(blob);
+                                await cache.put(url, responseToCache);
+                            } catch (e) {
+                                console.warn("Cache API not supported or error saving", e);
+                            }
+
+                            // 2. Cria URL e põe no player
+                            const blobUrl = URL.createObjectURL(blob);
+                            audioElement.src = blobUrl;
+                            
+                            // 3. Finaliza visual
+                            loaderText.textContent = "Ready!";
+                            setTimeout(() => {
+                                showPlayer(audioElement);
+                                resolve();
+                            }, 500);
+                        } else {
+                            loaderText.textContent = "Error";
+                            reject();
+                        }
+                    };
+
+                    xhr.onerror = () => {
+                        loaderText.textContent = "Network Error";
+                        reject();
+                    };
+
+                    xhr.send();
+                });
+            }
+
+            // --- GERENCIADOR PRINCIPAL ---
+            async function initializeAudio(audioElement) {
                 const url = audioElement.getAttribute('data-src');
-                
+                const wrapper = audioElement.parentElement;
+                const loaderText = wrapper.querySelector('.loading-text');
+
                 try {
-                    // Abre o "cofre" de cache
+                    // 1. Tenta pegar do Cache
                     const cache = await caches.open(CACHE_NAME);
-                    
-                    // Verifica se já tem essa música
-                    let response = await cache.match(url);
-                    
+                    const response = await cache.match(url);
+
                     if (response) {
-                        // JÁ EXISTE: Transforma em Blob e põe no player
-                        // Isso é instantâneo e não usa internet
+                        // -- CACHE HIT (Já tem salvo) --
+                        loaderText.textContent = "Loading cache...";
                         const blob = await response.blob();
-                        audioElement.src = URL.createObjectURL(blob);
-                        audioElement.classList.remove('loading');
+                        const blobUrl = URL.createObjectURL(blob);
+                        audioElement.src = blobUrl;
+                        showPlayer(audioElement);
                     } else {
-                        // NÃO EXISTE: Baixa da internet
-                        // statusMsg.textContent = "Downloading songs for offline use...";
-                        
-                        // Busca da rede
-                        const networkResponse = await fetch(url);
-                        
-                        // Clona a resposta (uma vai pro cache, outra pro player)
-                        cache.put(url, networkResponse.clone());
-                        
-                        const blob = await networkResponse.blob();
-                        audioElement.src = URL.createObjectURL(blob);
-                        audioElement.classList.remove('loading');
+                        // -- CACHE MISS (Precisa baixar) --
+                        // Chama a função com XHR para ter porcentagem
+                        loaderText.textContent = "0%";
+                        await downloadAndCache(audioElement);
                     }
-                    
-                    // Força carregar os metadados (duração) agora que temos o arquivo (ou blob)
-                    audioElement.load();
-                    
                 } catch (error) {
-                    console.error('Erro ao carregar áudio:', error);
-                    // Fallback: Se tudo der errado, usa o link direto
+                    console.error("Setup error:", error);
+                    // Fallback para streaming direto se tudo falhar
                     audioElement.src = url;
-                    audioElement.classList.remove('loading');
+                    showPlayer(audioElement);
                 }
             }
 
-            // --- 2. INICIA O CARREGAMENTO DE TODAS ---
-            // Fazemos isso sequencialmente ou em paralelo. 
-            // Em paralelo é mais rápido para aparecer os players.
-            const loadPromises = Array.from(audios).map(audio => loadAudioFromCache(audio));
-            
-            // Aguarda (opcional, apenas para limpar msg se quiser)
-            Promise.all(loadPromises).then(() => {
-                statusMsg.textContent = "✨ Ready! Songs saved locally.";
-                setTimeout(() => { statusMsg.textContent = ""; }, 3000);
+            // Dispara o processo para todos os áudios
+            // Fazemos sequencial ou paralelo? Paralelo é mais rápido, mas consome mais banda junta.
+            // Para ver as porcentagens subindo bonitinho, paralelo é legal.
+            audios.forEach(audio => {
+                initializeAudio(audio);
             });
 
-            // --- 3. Lógica de Tocar Um por Vez ---
+            // --- Lógica de Tocar Um por Vez ---
             audios.forEach(audio => {
                 audio.addEventListener('play', function() {
                     audios.forEach(otherAudio => {
@@ -407,10 +554,9 @@
                 });
             });
 
-            // --- 4. Lógica do Botão de Loop ---
+            // --- Lógica do Botão de Loop ---
             btnLoop.addEventListener('click', function() {
                 isLooping = !isLooping; 
-
                 if (isLooping) {
                     btnLoop.classList.add('active');
                     btnText.textContent = "🔁 Auto Repeat: ON";
@@ -418,7 +564,6 @@
                     btnLoop.classList.remove('active');
                     btnText.textContent = "🔁 Auto Repeat: OFF";
                 }
-
                 audios.forEach(audio => {
                     audio.loop = isLooping;
                 });
